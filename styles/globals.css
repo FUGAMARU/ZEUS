@@ -14,3 +14,68 @@ a {
 * {
   box-sizing: border-box;
 }
+
+/*追記ここから*/
+
+p {
+	color: #4a4848;
+}
+
+@font-face {
+	font-family: "Kazesawa-Regular";
+	src: url(/fonts/Kazesawa-Regular.woff2);
+}
+
+@font-face {
+	font-family: "Kazesawa-Bold";
+	src: url(/fonts/Kazesawa-Bold.woff2);
+}
+
+@font-face {
+	font-family: "Kazesawa-Semibold";
+	src: url(/fonts/Kazesawa-Semibold.woff2);
+}
+
+.kb {
+	font-family: "Kazesawa-Bold";
+}
+
+.kr {
+	font-family: "Kazesawa-Regular";
+}
+
+.ksb {
+	font-family: "Kazesawa-Semibold";
+}
+
+.clock-hr {
+	position: relative;
+	height: 2px;
+	border-width: 0;
+	background-color: #9289fb;
+	background-image: -webkit-linear-gradient(left,	#c96fa3 0%, #9289fb 50%, #65cccd 100%);
+	background-image:         linear-gradient(90deg, #c96fa3 0%, #9289fb 50%, #65cccd 100%);
+}
+
+.user-info-wrapper .user-info-name,
+.user-info-wrapper .user-info-icon{
+	position: relative;
+	margin-right: 0.7rem;
+}
+
+.user-info-wrapper .user-info-name::after{
+	position: absolute;
+	top: 0;
+	left: 100%;
+	margin: 0 0.5rem;
+	content: "";
+	width: 1px;
+	height: 100%;
+	background-color: #949494;
+}
+
+.user-info-name p {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}

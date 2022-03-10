@@ -1,27 +1,73 @@
+//React Hooks
+import { useEffect, useState, useRef } from 'react'
+
+//Custom Hooks
+import { useResponsive } from '../hooks/useResponsive'
+
+//Next.js Components
 import Head from 'next/head'
 import type { NextPage } from 'next'
+import Image from 'next/image'
 
-import { Container, Box, Center, SimpleGrid, Flex } from '@chakra-ui/react'
+//Chakra UI Components
+import { Container, Box, Center, SimpleGrid } from '@chakra-ui/react'
 
-const Home: NextPage = () => {
+//Custom Components
+import Clock from '../components/Clock'
+import UserInfo from '../components/UserInfo'
+
+//Libraries
+import useSWR from 'swr'
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+const Home:NextPage = () => {
+	const [unixTime, setUnixTime] = useState(0) //UNIXタイムスタンプ(1秒ごとに自動更新)
+	const [isClockStarted, setClockStarted] = useState(false) //UNIXタイムスタンプのカウントアップがスタートしているか
+	const refUNIX = useRef(unixTime)
+	
+	const { data, error } = useSWR("https://worldtimeapi.org/api/timezone/Asia/Tokyo", fetcher);
+	if(error) alert("時刻データーを受信できませんでした")
+
+	useEffect(() => {
+		setInterval(() => {
+			//console.log(refUNIX.current)
+		}, 1000)
+	}, [])
+
+	useEffect(() => {
+		refUNIX.current = unixTime
+	}, [unixTime])
+
+	useEffect(() => {
+		console.log("新規時刻データー受信")
+		console.log(data)
+		if(data !== undefined && isClockStarted === false){
+			setUnixTime(data.unixtime + 1)
+			setClockStarted(true)
+			setInterval(() => {
+				setUnixTime(prev => prev + 1)
+			}, 1000)
+		}
+	}, [data])
+
 	return (
-		<Box minHeight="100vh" bg="#e3e3e3">
+		<Box minHeight="100vh" bg="#f0f0f0">
 			<Head>
 				<title>ZEUS</title>
 				<meta name="viewport" content="initial-scale=1.0, width=device-width" />
 			</Head>
 			{/*base => スマホ / md => タブレット / lg => PC*/}
+			<Box h="0.5rem"></Box>
 			<Container maxW="1280px" px={{base: "0px", md: "0.5rem", lg: "auto"}}>
 				<SimpleGrid columns={3} spacing={0}>
-					<Center bg="purple.300">
-						日付
+					<Center>
+						<Clock unixTime={unixTime}/>
 					</Center>
-					<Center bg="cyan.300">
-						ZEUSロゴ
+					<Center>
+						<Image src="/zeus.svg" width={269} height={70} />
 					</Center>
-					<Center bg="teal.300">
-						ユーザー情報
-						{/*スマホ表示のときはアイコンだけ、PC・タブレット表示のときは名前も*/}
+					<Center>
+						<UserInfo />
 					</Center>	
 				</SimpleGrid>
 
@@ -36,7 +82,7 @@ const Home: NextPage = () => {
 				</SimpleGrid>
 
 				<Center bg="gray.300">フッター</Center>
-				
+				<p>{`Responsive: ${useResponsive()}`}</p>
 			</Container>
 		</Box>
 	)
