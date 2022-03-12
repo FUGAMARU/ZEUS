@@ -37,9 +37,9 @@ const Clock = (props: Props) => {
 
 	return(
 		<div>
-			{responsiveType === "SmartPhone" ? <p className="kb" style={{fontSize: "0.95rem"}}>{`${datetime.month}/${datetime.date}(${datetime.day}) ${datetime.hour}:${datetime.minute}`}</p> : null}
-			{responsiveType === "Tablet" ? <p className="kb">{`${datetime.year}年${datetime.month}月${datetime.date}日(${datetime.day}) ${datetime.hour}:${datetime.minute}`}</p> : null}
-			{responsiveType === "PC" ? <p className="kb" style={{fontSize: "1.1rem"}}>{`${datetime.year}年${datetime.month}月${datetime.date}日(${datetime.day}) ${datetime.hour}:${datetime.minute}`}</p> : null}
+			{responsiveType === "SmartPhone" && <p className="kb" style={{fontSize: "0.95rem"}}>{`${datetime.month}/${datetime.date}(${datetime.day}) ${datetime.hour}:${datetime.minute}`}</p>}
+			{responsiveType === "Tablet" && <p className="kb">{`${datetime.year}年${datetime.month}月${datetime.date}日(${datetime.day}) ${datetime.hour}:${datetime.minute}`}</p>	}
+			{responsiveType === "PC" && <p className="kb" style={{fontSize: "1.1rem"}}>{`${datetime.year}年${datetime.month}月${datetime.date}日(${datetime.day}) ${datetime.hour}:${datetime.minute}`}</p>}
 			<hr className="clock-hr" />
 		</div>
 	)

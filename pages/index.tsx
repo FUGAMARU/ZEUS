@@ -22,7 +22,6 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 //Contexts
 import { SocketContext } from '../contexts/SocketIO'
-import { route } from 'next/dist/server/router'
 
 const Home:NextPage = () => {
 	const [unixTime, setUnixTime] = useState(0) //UNIXタイムスタンプ(1秒ごとに自動更新)
@@ -71,7 +70,7 @@ const Home:NextPage = () => {
 	}, [data])
 
 	return (
-		<Box minHeight="100vh" bg="#f0f0f0">
+		<Box minHeight="100vh" bg="#f0f0f0" position="relative">
 			<Head>
 				<title>ZEUS</title>
 				<meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -103,11 +102,11 @@ const Home:NextPage = () => {
 
 				<Center bg="gray.300">フッター</Center>
 				<p>{`Responsive: ${useResponsive()}`}</p>
-
-				<Box position="absolute" bottom={{base: 5, lg: 30}} right={{base: 5, lg: 30}} height={{base: 120, lg: 200}} width={{base: 86, lg: 143}} style={{transform: "rotate(15deg)"}}>
-					<Image src="/pacchixi.png" layout="fill" />
-				</Box>
 			</Container>
+			
+			<Box position="absolute" bottom={{base: 5, md: 19, lg: 30}} right={{base: 5, md: 19, lg: 30}} height={{base: 120, md: 160, lg: 200}} width={{base: 86, md: 114, lg: 143}} style={{transform: "rotate(15deg)"}}>
+				<Image src="/pacchixi.png" layout="fill" />
+			</Box>
 		</Box>
 	)
 }
