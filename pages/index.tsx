@@ -1,5 +1,5 @@
 //React Hooks
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useContext } from 'react'
 
 //Custom Hooks
 import { useResponsive } from '../hooks/useResponsive'
@@ -20,19 +20,34 @@ import UserInfo from '../components/UserInfo'
 import useSWR from 'swr'
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
+//Contexts
+import { SocketContext } from '../contexts/SocketIO'
+
 const Home:NextPage = () => {
 	const [unixTime, setUnixTime] = useState(0) //UNIXタイムスタンプ(1秒ごとに自動更新)
 	const [isClockStarted, setClockStarted] = useState(false) //UNIXタイムスタンプのカウントアップがスタートしているか
 	const refUNIX = useRef(unixTime)
+	const socket = useContext(SocketContext)
 	
 	const { data, error } = useSWR("https://worldtimeapi.org/api/timezone/Asia/Tokyo", fetcher);
 	if(error) alert("時刻データーを受信できませんでした")
 
 	useEffect(() => {
-		setInterval(() => {
+		const unixChecker = setInterval(() => {
 			//console.log(refUNIX.current)
 		}, 1000)
+
+		return () => {
+			clearInterval(unixChecker)
+		}
 	}, [])
+
+	useEffect(() => {
+		socket.on("connection", (res: string) => {
+			console.log("WebSocket接続完了！")
+			console.log(res)
+		})
+	}, [socket])
 
 	useEffect(() => {
 		refUNIX.current = unixTime
