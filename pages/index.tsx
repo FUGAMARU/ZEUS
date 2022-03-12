@@ -27,10 +27,9 @@ const Home:NextPage = () => {
 	const [unixTime, setUnixTime] = useState(0) //UNIXタイムスタンプ(1秒ごとに自動更新)
 	const [isClockStarted, setClockStarted] = useState(false) //UNIXタイムスタンプのカウントアップがスタートしているか
 	const refUNIX = useRef(unixTime)
-	const socket = useContext(SocketContext)
+	const socket = useContext(SocketContext) //Socket.IOオブジェクトのContext
 	
 	const { data, error } = useSWR("https://worldtimeapi.org/api/timezone/Asia/Tokyo", fetcher);
-	if(error) alert("時刻データーを受信できませんでした")
 
 	useEffect(() => {
 		const unixChecker = setInterval(() => {
@@ -56,12 +55,17 @@ const Home:NextPage = () => {
 	useEffect(() => {
 		console.log("新規時刻データー受信")
 		console.log(data)
-		if(data !== undefined && isClockStarted === false){
-			setUnixTime(data.unixtime + 1)
-			setClockStarted(true)
-			setInterval(() => {
-				setUnixTime(prev => prev + 1)
-			}, 1000)
+		if(data !== undefined){
+			if(isClockStarted === false){
+				setUnixTime(data.unixtime + 1)
+				setClockStarted(true)
+				setInterval(() => {
+					setUnixTime(prev => prev + 1)
+				}, 1000)
+			}else{
+				setUnixTime(data.unixtime + 1)
+				console.log(`時刻合わせ完了 - ${new Date(data.unixtime * 1000).toString()}`)
+			}
 		}
 	}, [data])
 
@@ -76,7 +80,7 @@ const Home:NextPage = () => {
 			<Container maxW="1280px" px={{base: "0px", md: "0.5rem", lg: "auto"}}>
 				<SimpleGrid columns={3} spacing={0}>
 					<Center>
-						<Clock unixTime={unixTime}/>
+						{!error ? <Clock unixTime={unixTime}/> : <p className="kb">時刻受信エラー</p>}
 					</Center>
 					<Center>
 						<Image src="/zeus.svg" width={269} height={70} />
