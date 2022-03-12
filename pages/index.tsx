@@ -10,11 +10,12 @@ import type { NextPage } from 'next'
 import Image from 'next/image'
 
 //Chakra UI Components
-import { Container, Box, Center, SimpleGrid } from '@chakra-ui/react'
+import { Container, Box, Center, SimpleGrid, Text } from '@chakra-ui/react'
 
 //Custom Components
 import Clock from '../components/Clock'
 import UserInfo from '../components/UserInfo'
+import CurrentClass from '../components/CurrentClass'
 
 //Libraries
 import useSWR from 'swr'
@@ -77,10 +78,10 @@ const Home:NextPage = () => {
 			</Head>
 			{/*base => スマホ / md => タブレット / lg => PC*/}
 			<Box h="0.5rem"></Box>
-			<Container maxW="1280px" px={{base: "0px", md: "0.5rem", lg: "auto"}}>
+			<Container maxW="1280px" px={0}>
 				<SimpleGrid columns={3} spacing={0}>
 					<Center>
-						{!error ? <Clock unixTime={unixTime}/> : <p className="kb">時刻受信エラー</p>}
+						{!error ? <Clock unixTime={unixTime}/> : <p className="kb">時刻情報再取得中…</p>}
 					</Center>
 					<Center>
 						<Image src="/zeus.svg" width={269} height={70} />
@@ -90,8 +91,8 @@ const Home:NextPage = () => {
 					</Center>	
 				</SimpleGrid>
 
-				<SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={5} my={10}>
-					<Box bg="blue.300">現在進行中の授業</Box>
+				<SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={5} my={10} mx={3}>
+					<CurrentClass />
 					<Box bg="red.300">次の授業</Box>
 					<Box bg="orange.300">FileDispenser</Box>
 					<Box bg="yellow.300">チャット</Box>
