@@ -16,6 +16,7 @@ import { Container, Box, Center, SimpleGrid, Text } from '@chakra-ui/react'
 import Clock from '../components/Clock'
 import UserInfo from '../components/UserInfo'
 import CurrentClass from '../components/CurrentClass'
+import NextClass from '../components/NextClass'
 
 //Libraries
 import useSWR from 'swr'
@@ -93,7 +94,7 @@ const Home:NextPage = () => {
 
 				<SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={5} my={10} mx={3}>
 					<CurrentClass />
-					<Box bg="red.300">次の授業</Box>
+					<NextClass />
 					<Box bg="orange.300">FileDispenser</Box>
 					<Box bg="yellow.300">チャット</Box>
 					<Box bg="purple.300">BBS</Box>
@@ -102,7 +103,7 @@ const Home:NextPage = () => {
 				</SimpleGrid>
 
 				<Center bg="gray.300">フッター</Center>
-				<p>{`Responsive: ${useResponsive()}`}</p>
+				<Text>{`Responsive: ${useResponsive()}`}</Text>
 			</Container>
 			
 			<Box position="absolute" bottom={{base: 5, md: 19, lg: 30}} right={{base: 5, md: 19, lg: 30}} height={{base: 120, md: 160, lg: 200}} width={{base: 86, md: 114, lg: 143}} style={{transform: "rotate(15deg)"}}>

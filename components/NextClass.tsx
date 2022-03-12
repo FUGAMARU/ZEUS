@@ -5,7 +5,7 @@ import { useTouchDevice } from '../hooks/useTouchDevice'
 import Image from 'next/image'
 
 //Chakra UI Components
-import { Box, Text, Flex, Button } from '@chakra-ui/react'
+import { Box, Text, Flex, Button, Center } from '@chakra-ui/react'
 
 //Libraries
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -14,46 +14,44 @@ import { faClock } from '@fortawesome/free-regular-svg-icons'
 import { CircularProgressbarWithChildren, buildStyles } from 'react-circular-progressbar'
 import 'react-circular-progressbar/dist/styles.css'
 
-const CurrentClass = () => {
-	const percentage = 65
+const NextClass = () => {
+	const percentage = 62
 	const isTouchDevice = useTouchDevice()
 
 	return(
 		<Box bg="white" shadow="xl" borderRadius={15} py={4} transition="0.4s all ease-out" _hover={!isTouchDevice ? {transform: "scale(1.05, 1.05)"} : {}}>
-			<Text className="kb" color="black" fontSize={23} ml={5}>現在の授業</Text>
-			<Box h={1} w="80%" bgGradient="linear(to-r, #dfec51, #73aa0a)" borderRightRadius={10}></Box>
+			<Text className="kb" color="black" fontSize={23} ml={5}>次の授業</Text>
+			<Box h={1} w="80%" bgGradient="linear(to-r, #09e7d3, #008bb6)" borderRightRadius={10}></Box>
 			<Flex mt={3} justifyContent="space-around" alignItems="center">
 				<Box px={2}>
 					<Box h={130} w={130}>
+						{/*次の授業開始時刻まで60分を切ったらプログレスバーをカウントダウンしていく(それまでは常時100%)*/}
 						<CircularProgressbarWithChildren value={percentage} styles={buildStyles({
-							pathColor: "#dae93f",
+							pathColor: "#57dfd0",
 							trailColor: "#ededed"
 						})}>
-							<Text className="kr" fontSize={13}>残り</Text>
-							<Text className="kb" fontSize={20}>63分</Text>
+							<Text className="kr" fontSize={13}>あと</Text>
+							<Text className="kb" fontSize={20}>37分</Text>
 						</CircularProgressbarWithChildren>
 					</Box>
 				</Box>
 				<Box px={2}>
-					<Text className="kb" textAlign="center">モバイルプログラミング Ⅰ</Text>
+					<Text className="kb" textAlign="center">モバイル設計 Ⅰ</Text>
 					<Flex justifyContent="center" alignItems="center">
-						<FontAwesomeIcon icon={faClock} color="#4a4848" style={{height: "0.8rem"}} /><Text className="kr" textAlign="center" fontSize={13} ml={1.5} >1時限～4時限</Text>
+						<FontAwesomeIcon icon={faClock} color="#4a4848" style={{height: "0.8rem"}} /><Text className="kr" textAlign="center" fontSize={13} ml={1.5} >5時限～7時限</Text>
 					</Flex>
 					<Flex justifyContent="center" alignItems="center">
-						<FontAwesomeIcon icon={faChalkboardUser} color="#4a4848" style={{height: "0.8rem"}} /><Text className="kr" textAlign="center" fontSize={13} ml={1.5} >桜 ねね</Text>
+						<FontAwesomeIcon icon={faChalkboardUser} color="#4a4848" style={{height: "0.8rem"}} /><Text className="kr" textAlign="center" fontSize={13} ml={1.5} >涼風 青葉</Text>
 					</Flex>
 				</Box>
 			</Flex>
-			<Flex mt={4} justifyContent="space-around">
+			<Center mt={4} justifyContent="space-around">
 				<Button variant="outline" size="sm" colorScheme="green" leftIcon={<Image src="/classroom.svg" width={20} height={17}></Image>}>
 					<a href="https://classroom.google.com/" target="_blank" rel="noopener noreferrer">Classroomを開く</a>
 				</Button>
-				<Button variant="outline" size="sm" colorScheme="blue" leftIcon={<Image src="/zoom.svg" width={22} height={22}></Image>}>
-				<a href="https://zoom.us/" target="_blank" rel="noopener noreferrer">Zoomに参加する</a>
-				</Button>
-			</Flex>
+			</Center>
 		</Box>
 	)
 }
 
-export default CurrentClass
+export default NextClass
