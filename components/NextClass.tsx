@@ -9,7 +9,7 @@ import { Box, Text, Flex, Button, Center } from '@chakra-ui/react'
 
 //Libraries
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChalkboardUser } from '@fortawesome/free-solid-svg-icons'
+import { faChalkboardUser, faLocationDot } from '@fortawesome/free-solid-svg-icons'
 import { faClock } from '@fortawesome/free-regular-svg-icons'
 import { CircularProgressbarWithChildren, buildStyles } from 'react-circular-progressbar'
 import 'react-circular-progressbar/dist/styles.css'
@@ -20,7 +20,7 @@ const NextClass = () => {
 
 	return(
 		<Box bg="white" shadow="xl" borderRadius={15} py={4} transition="0.4s all ease-out" _hover={!isTouchDevice ? {transform: "scale(1.05, 1.05)"} : {}}>
-			<Text className="kb" color="black" fontSize={23} ml={5}>次の授業</Text>
+			<Text className="rmb" color="#2b2b2b" fontSize={23} ml={5}>次の授業</Text>
 			<Box h={1} w="80%" bgGradient="linear(to-r, #09e7d3, #008bb6)" borderRightRadius={10}></Box>
 			<Flex mt={3} justifyContent="space-around" alignItems="center">
 				<Box px={2}>
@@ -37,8 +37,12 @@ const NextClass = () => {
 				</Box>
 				<Box px={2}>
 					<Text className="kb" textAlign="center">モバイル設計 Ⅰ</Text>
+					<hr className="class-hr"/>
 					<Flex justifyContent="center" alignItems="center">
 						<FontAwesomeIcon icon={faClock} color="#4a4848" style={{height: "0.8rem"}} /><Text className="kr" textAlign="center" fontSize={13} ml={1.5} >5時限～7時限</Text>
+					</Flex>
+					<Flex justifyContent="center" alignItems="center">
+						<FontAwesomeIcon icon={faLocationDot} color="#4a4848" style={{height: "0.8rem"}} /><Text className="kr" textAlign="center" fontSize={13} ml={1.5} >研究棟B 5階 第1教室</Text>
 					</Flex>
 					<Flex justifyContent="center" alignItems="center">
 						<FontAwesomeIcon icon={faChalkboardUser} color="#4a4848" style={{height: "0.8rem"}} /><Text className="kr" textAlign="center" fontSize={13} ml={1.5} >涼風 青葉</Text>

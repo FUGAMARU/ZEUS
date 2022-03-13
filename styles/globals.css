@@ -36,6 +36,11 @@ p {
 	src: url(/fonts/Kazesawa-Semibold.woff2);
 }
 
+@font-face {
+	font-family: "Rounded-MPlus-1C-Bold";
+	src: url(/fonts/rounded-mplus-1c-bold.woff2);
+}
+
 .kb {
 	font-family: "Kazesawa-Bold";
 }
@@ -48,6 +53,10 @@ p {
 	font-family: "Kazesawa-Semibold";
 }
 
+.rmb {
+	font-family: "Rounded-MPlus-1C-Bold";
+}
+
 .clock-hr {
 	position: relative;
 	height: 2px;
@@ -55,6 +64,12 @@ p {
 	background-color: #9289fb;
 	background-image: -webkit-linear-gradient(left,	#c96fa3 0%, #9289fb 50%, #65cccd 100%);
 	background-image:         linear-gradient(90deg, #c96fa3 0%, #9289fb 50%, #65cccd 100%);
+}
+
+.class-hr {
+	width: 100%;
+	border-top: 1px dashed #ccc;
+	margin: 0.5rem 0 0.5rem;
 }
 
 .user-info-wrapper .user-info-name,
@@ -78,16 +93,4 @@ p {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-}
-
-.indi {
-	display: flex;
-    justify-content: center;
-    text-align: center;
-    position: absolute;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    margin: 0 auto;
-    user-select: none;
 }
