@@ -17,6 +17,7 @@ import Clock from '../components/Clock'
 import UserInfo from '../components/UserInfo'
 import CurrentClass from '../components/CurrentClass'
 import NextClass from '../components/NextClass'
+import FileDispenser from '../components/FileDispenser'
 
 //Libraries
 import useSWR from 'swr'
@@ -95,7 +96,7 @@ const Home:NextPage = () => {
 				<SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={5} my={10} mx={3}>
 					<CurrentClass />
 					<NextClass />
-					<Box bg="orange.300">FileDispenser</Box>
+					<FileDispenser />
 					<Box bg="yellow.300">チャット</Box>
 					<Box bg="purple.300">BBS</Box>
 					<Box bg="cyan.300">お知らせ</Box>

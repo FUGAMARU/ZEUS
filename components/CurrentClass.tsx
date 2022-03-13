@@ -21,8 +21,8 @@ const CurrentClass = () => {
 	return(
 		<Box bg="white" shadow="xl" borderRadius={15} py={4} transition="0.4s all ease-out" _hover={!isTouchDevice ? {transform: "scale(1.05, 1.05)"} : {}}>
 			<Text className="rmb" color="#2b2b2b" fontSize={23} ml={5}>現在の授業</Text>
-			<Box h={1} w="80%" bgGradient="linear(to-r, #dfec51, #73aa0a)" borderRightRadius={10}></Box>
-			<Flex mt={3} justifyContent="space-around" alignItems="center">
+			<Box h={1} w="80%" mb={3} bgGradient="linear(to-r, #dfec51, #73aa0a)" borderRightRadius={10}></Box>
+			<Flex justifyContent="space-around" alignItems="center">
 				<Box px={2}>
 					<Box h={130} w={130}>
 						<CircularProgressbarWithChildren value={percentage} styles={buildStyles({

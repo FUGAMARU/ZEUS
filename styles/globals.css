@@ -57,6 +57,7 @@ p {
 	font-family: "Rounded-MPlus-1C-Bold";
 }
 
+/* 時計の下線 */
 .clock-hr {
 	position: relative;
 	height: 2px;
@@ -66,12 +67,14 @@ p {
 	background-image:         linear-gradient(90deg, #c96fa3 0%, #9289fb 50%, #65cccd 100%);
 }
 
+/* 授業カードの科目名の下線 */
 .class-hr {
 	width: 100%;
 	border-top: 1px dashed #ccc;
 	margin: 0.5rem 0 0.5rem;
 }
 
+/* ユーザー名とユーザーアイコンを隔てる縦線 */
 .user-info-wrapper .user-info-name,
 .user-info-wrapper .user-info-icon{
 	position: relative;
@@ -89,8 +92,22 @@ p {
 	background-color: #949494;
 }
 
+/* ユーザー名がはみ出した時に末尾を…にする */
 .user-info-name p {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+
+/* スクロールバー */
+::-webkit-scrollbar {
+	width: 13px;                
+	background-color: #f3f3f3;
+	border-radius: 20px;
+}
+  
+::-webkit-scrollbar-thumb {
+	border-radius: 20px;            
+	box-shadow: inset 0 0 10px 10px #909090;
+	border: solid 4px transparent;
 }
