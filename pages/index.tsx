@@ -15,6 +15,7 @@ import { Container, Box, Center, SimpleGrid, Text } from '@chakra-ui/react'
 //Custom Components
 import Clock from '../components/Clock'
 import UserInfo from '../components/UserInfo'
+import FunctionCard from '../components/FunctionCard'
 import CurrentClass from '../components/CurrentClass'
 import NextClass from '../components/NextClass'
 import FileDispenser from '../components/FileDispenser'
@@ -94,9 +95,9 @@ const Home:NextPage = () => {
 				</SimpleGrid>
 
 				<SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={5} my={10} mx={3}>
-					<CurrentClass />
-					<NextClass />
-					<FileDispenser />
+					<FunctionCard title="現在の授業" gradientStartHex="#dfec51" gradientEndHex="#73aa0a" childComponent={<CurrentClass />} />
+					<FunctionCard title="次の授業" gradientStartHex="#09e7d3" gradientEndHex="#008bb6" childComponent={<NextClass />} />
+					<FunctionCard title="FileDispenser" gradientStartHex="#fad961" gradientEndHex="#f76b1b" childComponent={<FileDispenser />} />
 					<Box bg="yellow.300">チャット</Box>
 					<Box bg="purple.300">BBS</Box>
 					<Box bg="cyan.300">お知らせ</Box>

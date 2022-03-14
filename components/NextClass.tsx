@@ -1,6 +1,3 @@
-//Custom Hooks
-import { useTouchDevice } from '../hooks/useTouchDevice'
-
 //Next.js Components
 import Image from 'next/image'
 
@@ -16,12 +13,9 @@ import 'react-circular-progressbar/dist/styles.css'
 
 const NextClass = () => {
 	const percentage = 62
-	const isTouchDevice = useTouchDevice()
 
 	return(
-		<Box bg="white" shadow="xl" borderRadius={15} py={4} transition="0.4s all ease-out" _hover={!isTouchDevice ? {transform: "scale(1.05, 1.05)"} : {}}>
-			<Text className="rmb" color="#2b2b2b" fontSize={23} ml={5}>次の授業</Text>
-			<Box h={1} w="80%" mb={3} bgGradient="linear(to-r, #09e7d3, #008bb6)" borderRightRadius={10}></Box>
+		<Box>
 			<Flex justifyContent="space-around" alignItems="center">
 				<Box px={2}>
 					<Box h={130} w={130}>
