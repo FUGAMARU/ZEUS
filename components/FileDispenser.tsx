@@ -7,7 +7,7 @@ import { Box, Text, Flex, Button, VStack, StackDivider } from '@chakra-ui/react'
 const FileDispenser = () => {
 	return(
 		<Box>
-			<VStack px={5} py={2} align="stretch" divider={<StackDivider borderColor="gray.200"/>} overflowY="auto" maxH={180}>
+			<VStack px={5} py={2} align="stretch" divider={<StackDivider borderColor="gray.200"/>} overflowY="auto" h={{base: 180, md: 400, lg: 180}}>
 				{/*将来的にはコンポーネント化する*/}
 				<Flex justifyContent="space-between" alignItems="center" minH={8}>
 					<Flex>

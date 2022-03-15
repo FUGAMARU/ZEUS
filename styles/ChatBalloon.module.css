@@ -1,0 +1,46 @@
+.other {
+	margin: 0.1rem 0.2rem 0.5rem 1rem; /* 上 右 下 左 */
+	padding: 0.3rem 0.7rem;  /* 上下 左右*/
+	position: relative;
+	border-radius: 20px;
+	background-color: #ffffff;
+	font-size: 0.8rem;
+	max-width: 15rem;
+	display: inline-block;
+}
+
+.me {
+	margin: 0.5rem 1.2rem 0.5rem 0.2rem;  /* 上 右 下 左 */
+	padding: 0.3rem 0.6rem 0.3rem 0.7rem; /* 上下 左右*/
+	position: relative;
+	border-radius: 20px;
+	background-color: #8de055;
+	font-size: 0.8rem;
+	max-width: 17rem;
+	display: inline-block;
+}
+
+
+.other::after {
+	content: '';
+	position: absolute;
+	display: block;
+	width: 0;
+	height: 0;
+	left: -10px;
+	top: 5px;
+	border-right: 20px solid #ffffff;
+	border-bottom: 10px solid transparent;
+}
+
+.me::after {
+	content: '';
+	position: absolute;
+	display: block;
+	width: 0;
+	height: 0;
+	right: -10px;
+	top: 5px;
+	border-left: 20px solid #8de055;
+	border-bottom: 10px solid transparent;	
+}
