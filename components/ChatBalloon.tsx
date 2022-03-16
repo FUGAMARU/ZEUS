@@ -25,14 +25,14 @@ const ChatBalloon = (props: Me | Other) => {
 				<Box position="relative">
 					<Text fontSize="0.6rem" fontWeight="300" color="white" mb={3} position="absolute" bottom={0} left={-6}>{props.time}</Text>
 				</Box>
-				<Box className={styles.me}>{props.message}</Box>	
+				<Box className={styles.me} maxW="80%">{props.message}</Box>	
 			</Flex>
 		)
 	}else if(props.type === "other"){
 		return (
 			<Flex pl={3}>
 				<Avatar src={props.profileIconSrc} size="sm"></Avatar>
-				<Box>
+				<Box maxW="75%">
 					<Text color="white" fontSize="0.6rem" fontWeight="300" ml={2}>{props.userName}</Text>
 					<Box className={styles.other}>{props.message}</Box>
 				</Box>

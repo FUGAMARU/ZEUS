@@ -3,6 +3,7 @@ import { useEffect, useState, useRef, useContext } from 'react'
 
 //Custom Hooks
 import { useResponsive } from '../hooks/useResponsive'
+import { useTouchDevice } from '../hooks/useTouchDevice'
 
 //Next.js Components
 import Head from 'next/head'
@@ -107,7 +108,7 @@ const Home:NextPage = () => {
 				</SimpleGrid>
 
 				<Center bg="gray.300">フッター</Center>
-				<Text>{`Responsive: ${useResponsive()}`}</Text>
+				<Text display="inline-block">{`Responsive: ${useResponsive()}`}</Text>&nbsp;&nbsp;&nbsp;<Text display="inline-block">{`Touchable: ${useTouchDevice() ? "Yes" : "No"}`}</Text>
 			</Container>
 			
 			<Box position="absolute" bottom={{base: 5, md: 19, lg: 30}} right={{base: 5, md: 19, lg: 30}} height={{base: 120, md: 160, lg: 200}} width={{base: 86, md: 114, lg: 143}} style={{transform: "rotate(15deg)"}}>

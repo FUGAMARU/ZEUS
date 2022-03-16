@@ -22,7 +22,7 @@ const Chat = () => {
 				<ChatBalloon type="other" message="もじゃもじゃ？" userName="ココアさん" time="15:12" profileIconSrc="https://hominis.media/2018/06/images/03_gochiusa.jpg" />
 				<ChatBalloon type="me" message="これですか？" time="15:12" />
 				<ChatBalloon type="me" message="これはティッピーです。一応ウサギです。" time="15:12" />
-				<ChatBalloon type="other" message="ウサギー？" userName="ココアさん" time="15:12" profileIconSrc="https://hominis.media/2018/06/images/03_gochiusa.jpg" />
+				<ChatBalloon type="other" message="ウサギ～？" userName="ココアさん" time="15:12" profileIconSrc="https://hominis.media/2018/06/images/03_gochiusa.jpg" />
 				<ChatBalloon type="me" message="ご注文は…？" time="15:12" />
 				<ChatBalloon type="other" message="じゃあ、そのウサギさん！" userName="ココアさん" time="15:12" profileIconSrc="https://hominis.media/2018/06/images/03_gochiusa.jpg" />
 				<ChatBalloon type="me" message="非売品です" time="15:12" />

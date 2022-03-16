@@ -5,18 +5,16 @@
 	border-radius: 20px;
 	background-color: #ffffff;
 	font-size: 0.8rem;
-	max-width: 15rem;
 	display: inline-block;
 }
 
 .me {
 	margin: 0.5rem 1.2rem 0.5rem 0.2rem;  /* 上 右 下 左 */
-	padding: 0.3rem 0.6rem 0.3rem 0.7rem; /* 上下 左右*/
+	padding: 0.3rem 0.6rem 0.3rem 0.7rem; /* 上 右 下 左 */
 	position: relative;
 	border-radius: 20px;
 	background-color: #8de055;
 	font-size: 0.8rem;
-	max-width: 17rem;
 	display: inline-block;
 }
 
