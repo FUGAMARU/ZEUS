@@ -93,7 +93,7 @@ p {
 }
 
 /* ユーザー名がはみ出した時に末尾を…にする */
-.user-info-name p {
+.tpl {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;

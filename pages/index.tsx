@@ -21,6 +21,7 @@ import CurrentClass from '../components/CurrentClass'
 import NextClass from '../components/NextClass'
 import FileDispenser from '../components/FileDispenser'
 import Chat from '../components/Chat'
+import BBS from '../components/BBS'
 
 //Libraries
 import useSWR from 'swr'
@@ -99,9 +100,9 @@ const Home:NextPage = () => {
 				<SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={5} my={10} mx={3}>
 					<FunctionCard title="現在の授業" gradientStartHex="#dfec51" gradientEndHex="#73aa0a" childComponent={<CurrentClass />} />
 					<FunctionCard title="次の授業" gradientStartHex="#09e7d3" gradientEndHex="#008bb6" childComponent={<NextClass />} />
-					<FunctionCard title="FileDispenser" gradientStartHex="#fad961" gradientEndHex="#f76b1b" childComponent={<FileDispenser />} />
+					<FunctionCard title="FileDispenser" gradientStartHex="#ffd97b" gradientEndHex="#f6a742" childComponent={<FileDispenser />} />
 					<FunctionCard title="チャット" gradientStartHex="#ffa7e6" gradientEndHex="#ea6362" childComponent={<Chat />} />
-					<Box bg="purple.300">BBS</Box>
+					<FunctionCard title="BBS" gradientStartHex="#a2b6df" gradientEndHex="#33569b" childComponent={<BBS />} />
 					<Box bg="cyan.300">お知らせ</Box>
 					<Box bg="teal.300">やること</Box>
 					<Box bg="yellow.300">システムログ</Box>
