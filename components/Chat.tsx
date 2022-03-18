@@ -18,7 +18,7 @@ const Chat = () => {
 				</ButtonGroup>				
 			</Center>
 
-			<Box bg="#7992c0" h={320} pt={3} overflow="auto">
+			<Box bg="#7992c0" h={425} pt={3} overflow="auto">
 				<ChatBalloon type="other" message="もじゃもじゃ？" userName="ココアさん" time="15:12" profileIconSrc="https://hominis.media/2018/06/images/03_gochiusa.jpg" />
 				<ChatBalloon type="me" message="これですか？" time="15:12" />
 				<ChatBalloon type="me" message="これはティッピーです。一応ウサギです。" time="15:12" />

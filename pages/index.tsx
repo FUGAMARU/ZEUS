@@ -101,7 +101,7 @@ const Home:NextPage = () => {
 					<FunctionCard title="現在の授業" gradientStartHex="#dfec51" gradientEndHex="#73aa0a" childComponent={<CurrentClass />} />
 					<FunctionCard title="次の授業" gradientStartHex="#09e7d3" gradientEndHex="#008bb6" childComponent={<NextClass />} />
 					<FunctionCard title="FileDispenser" gradientStartHex="#ffd97b" gradientEndHex="#f6a742" childComponent={<FileDispenser />} />
-					<FunctionCard title="チャット" gradientStartHex="#ffa7e6" gradientEndHex="#ea6362" childComponent={<Chat />} />
+					<FunctionCard title="チャット" gradientStartHex="#efbfd5" gradientEndHex="#9d61fd" childComponent={<Chat />} />
 					<FunctionCard title="BBS" gradientStartHex="#a2b6df" gradientEndHex="#33569b" childComponent={<BBS />} />
 					<Box bg="cyan.300">お知らせ</Box>
 					<Box bg="teal.300">やること</Box>
