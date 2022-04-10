@@ -1,5 +1,5 @@
 //React Hooks
-import { useState, useCallback } from "react"
+import { useState } from "react"
 
 //Chakra UI Components
 import { Box, VStack, StackDivider } from "@chakra-ui/react"
