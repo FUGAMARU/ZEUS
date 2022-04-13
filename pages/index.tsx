@@ -1,32 +1,32 @@
 //React Hooks
-import { useEffect, useState, useContext } from 'react'
+import { useEffect, useState, useContext } from "react"
 
 //Custom Hooks
-import { useResponsive } from '../hooks/useResponsive'
-import { useTouchDevice } from '../hooks/useTouchDevice'
-import useUNIXTime from '../hooks/useUNIXTime'
+import { useResponsive } from "../hooks/useResponsive"
+import { useTouchDevice } from "../hooks/useTouchDevice"
+import useUNIXTime from "../hooks/useUNIXTime"
 
 //Next.js Components
-import Head from 'next/head'
-import type { NextPage } from 'next'
-import Image from 'next/image'
+import Head from "next/head"
+import type { NextPage } from "next"
+import Image from "next/image"
 
 //Chakra UI Components
-import { Container, Box, Center, SimpleGrid, Text } from '@chakra-ui/react'
+import { Container, Box, Center, SimpleGrid, Text } from "@chakra-ui/react"
 
 //Custom Components
-import Clock from '../components/Clock'
-import UserInfo from '../components/UserInfo'
-import FunctionCard from '../components/FunctionCard'
-import CurrentClass from '../components/CurrentClass'
-import NextClass from '../components/NextClass'
-import FileDispenser from '../components/FileDispenser'
-import Chat from '../components/Chat'
-import BBS from '../components/BBS'
-import Information from '../components/Information'
+import Clock from "../components/Clock"
+import UserInfo from "../components/UserInfo"
+import FunctionCard from "../components/FunctionCard"
+import CurrentClass from "../components/CurrentClass"
+import NextClass from "../components/NextClass"
+import FileDispenser from "../components/FileDispenser"
+import Chat from "../components/Chat"
+import BBS from "../components/BBS"
+import Information from "../components/Information"
 
 //Contexts
-import { SocketContext } from '../contexts/SocketIO'
+import { SocketContext } from "../contexts/SocketIO"
 
 const Index: NextPage = () => {
 	const { UNIXTime, isUNIXTimeLoading, isUNXITimeError } = useUNIXTime()
