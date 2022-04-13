@@ -1,9 +1,10 @@
 //React Hooks
-import { useEffect, useState, useRef, useContext } from 'react'
+import { useEffect, useState, useContext } from 'react'
 
 //Custom Hooks
 import { useResponsive } from '../hooks/useResponsive'
 import { useTouchDevice } from '../hooks/useTouchDevice'
+import useUNIXTime from '../hooks/useUNIXTime'
 
 //Next.js Components
 import Head from 'next/head'
@@ -24,30 +25,14 @@ import Chat from '../components/Chat'
 import BBS from '../components/BBS'
 import Information from '../components/Information'
 
-//Libraries
-import useSWR from 'swr'
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
-
 //Contexts
 import { SocketContext } from '../contexts/SocketIO'
 
 const Index: NextPage = () => {
-	const [unixTime, setUnixTime] = useState(0) //UNIXタイムスタンプ(1秒ごとに自動更新)
+	const { UNIXTime, isUNIXTimeLoading, isUNXITimeError } = useUNIXTime()
+	const [localUNIXTime, setLocalUnixTime] = useState(0) //UNIXタイムスタンプ(1秒ごとに自動更新)
 	const [isClockStarted, setClockStarted] = useState(false) //UNIXタイムスタンプのカウントアップがスタートしているか
-	const refUNIX = useRef(unixTime)
 	const socket = useContext(SocketContext) //Socket.IOオブジェクトのContext
-	
-	const { data, error } = useSWR("https://worldtimeapi.org/api/timezone/Asia/Tokyo", fetcher);
-
-	useEffect(() => {
-		const unixChecker = setInterval(() => {
-			//console.log(refUNIX.current)
-		}, 1000)
-
-		return () => {
-			clearInterval(unixChecker)
-		}
-	}, [])
 
 	useEffect(() => {
 		socket.on("connection", (res: string) => {
@@ -57,25 +42,21 @@ const Index: NextPage = () => {
 	}, [socket])
 
 	useEffect(() => {
-		refUNIX.current = unixTime
-	}, [unixTime])
-
-	useEffect(() => {
-		console.log("新規時刻データー受信")
-		console.log(data)
-		if(data !== undefined){
+		console.log("UNIXタイムスタンプ新規受信")
+		console.log(UNIXTime)
+		if(UNIXTime){
 			if(isClockStarted === false){
-				setUnixTime(data.unixtime + 1)
+				setLocalUnixTime(UNIXTime + 1)
 				setClockStarted(true)
 				setInterval(() => {
-					setUnixTime(prev => prev + 1)
+					setLocalUnixTime(prev => prev + 1)
 				}, 1000)
 			}else{
-				setUnixTime(data.unixtime + 1)
-				console.log(`時刻合わせ完了 - ${new Date(data.unixtime * 1000).toString()}`)
+				setLocalUnixTime(UNIXTime + 1)
+				console.log(`時刻合わせ完了 - ${new Date(UNIXTime * 1000).toString()}`)
 			}
 		}
-	}, [data])
+	}, [UNIXTime])
 
 	return (
 		<Box minHeight="100vh" bg="#f0f0f0" position="relative">
@@ -88,7 +69,7 @@ const Index: NextPage = () => {
 			<Container maxW="1280px" px={0}>
 				<SimpleGrid columns={3} spacing={0}>
 					<Center>
-						{!error ? <Clock unixTime={unixTime} /> : <p className="kb">時刻情報再取得中…</p>}
+						{isUNIXTimeLoading ? <p className="kb">現在時刻取得中…</p> : isUNXITimeError ? <p className="kb">時刻取得エラー</p> : <Clock UNIXTime={localUNIXTime} />}
 					</Center>
 					<Center>
 						<Image src="/zeus.svg" width={269} height={70} />

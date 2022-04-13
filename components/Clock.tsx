@@ -10,7 +10,7 @@ import useMuroranWeather from "../hooks/useMuroranWeather"
 import { Box, Flex, Center, Text, Popover, PopoverTrigger, PopoverContent, PopoverHeader, PopoverBody, PopoverArrow, PopoverCloseButton, VStack, StackDivider } from '@chakra-ui/react'
 
 interface Props {
-	unixTime: number
+	UNIXTime: number
 }
 
 const Clock = (props: Props) => {
@@ -46,7 +46,7 @@ const Clock = (props: Props) => {
 
 	useEffect(() => {
 		//unixTime(親コンポーネントのstate)が更新されたらオブジェクトのフォーマットに合わせて更新する
-		const d = new Date(props.unixTime * 1000)
+		const d = new Date(props.UNIXTime * 1000)
 		setDatetime({
 			year: d.getFullYear(),
 			month: d.getMonth() + 1,
@@ -56,7 +56,7 @@ const Clock = (props: Props) => {
 			minute: ("00" + d.getMinutes()).slice(-2), //ゼロパディングも忘れずに！
 			second: ("00" + d.getSeconds()).slice(-2)
 		})
-	}, [props.unixTime])
+	}, [props.UNIXTime])
 
 	useEffect(() => {
 		if(tokyoWeather){
