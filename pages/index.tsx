@@ -31,7 +31,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 //Contexts
 import { SocketContext } from '../contexts/SocketIO'
 
-const Home:NextPage = () => {
+const Index: NextPage = () => {
 	const [unixTime, setUnixTime] = useState(0) //UNIXタイムスタンプ(1秒ごとに自動更新)
 	const [isClockStarted, setClockStarted] = useState(false) //UNIXタイムスタンプのカウントアップがスタートしているか
 	const refUNIX = useRef(unixTime)
@@ -88,7 +88,7 @@ const Home:NextPage = () => {
 			<Container maxW="1280px" px={0}>
 				<SimpleGrid columns={3} spacing={0}>
 					<Center>
-						{!error ? <Clock unixTime={unixTime}/> : <p className="kb">時刻情報再取得中…</p>}
+						{!error ? <Clock unixTime={unixTime} /> : <p className="kb">時刻情報再取得中…</p>}
 					</Center>
 					<Center>
 						<Image src="/zeus.svg" width={269} height={70} />
@@ -105,8 +105,7 @@ const Home:NextPage = () => {
 					<FunctionCard title="チャット" gradientStartHex="#09e863" gradientEndHex="#00b684" childComponent={<Chat />} />
 					<FunctionCard title="BBS" gradientStartHex="#a2b6df" gradientEndHex="#33569b" childComponent={<BBS />} />
 					<FunctionCard title="お知らせ" gradientStartHex="#efbfd5" gradientEndHex="#9d61fd" childComponent={<Information />} />
-					<Box bg="teal.300">やること</Box>
-					<Box bg="yellow.300">システムログ</Box>
+					<Box bg="teal.300">システムログ</Box>
 				</SimpleGrid>
 
 				<Center bg="gray.300">フッター</Center>
@@ -120,4 +119,4 @@ const Home:NextPage = () => {
 	)
 }
 
-export default Home
+export default Index
