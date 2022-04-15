@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import "../styles/globals.css"
+import "animate.css"
 import type { AppProps } from "next/app"
 import { ChakraProvider } from "@chakra-ui/react"
 import { SocketContext, socket } from "../contexts/SocketIO"

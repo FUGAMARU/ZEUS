@@ -8,9 +8,6 @@ import { Box, VStack, StackDivider } from "@chakra-ui/react"
 import ListHeading from "./ListHeading"
 import Thread from "./Thread"
 
-//Libraries
-import "animate.css"
-
 const BBS = () => {
 	const [listClasses, setListClasses] = useState("")
 	const [threadClasses, setThreadClasses] = useState("")

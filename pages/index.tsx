@@ -5,7 +5,6 @@ import { useEffect, useState, useContext } from "react"
 import { useResponsive } from "../hooks/useResponsive"
 import { useTouchDevice } from "../hooks/useTouchDevice"
 import useUNIXTime from "../hooks/useUNIXTime"
-import { useAuthState } from "react-firebase-hooks/auth"
 
 //Next.js Components
 import Head from "next/head"
@@ -25,19 +24,42 @@ import FileDispenser from "../components/FileDispenser"
 import Chat from "../components/Chat"
 import BBS from "../components/BBS"
 import Information from "../components/Information"
+import SignInWithGoogle from "../components/SignInWithGoogle"
+
+//Libraries
+import { onAuthStateChanged } from "firebase/auth"
 
 //Contexts
 import { SocketContext } from "../contexts/SocketIO"
 
 //Settings
-import { auth, provider } from "../firebase"
+import { auth } from "../firebase"
 
 const Index: NextPage = () => {
+	const responsiveType = useResponsive() //リアクティブな画面幅タイプの変数
+	const isTouchDevice = useTouchDevice() //タッチ可能かどうか
 	const { UNIXTime, isUNIXTimeLoading, isUNXITimeError } = useUNIXTime()
 	const [localUNIXTime, setLocalUnixTime] = useState(0) //UNIXタイムスタンプ(1秒ごとに自動更新)
 	const [isClockStarted, setClockStarted] = useState(false) //UNIXタイムスタンプのカウントアップがスタートしているか
 	const socket = useContext(SocketContext) //Socket.IOオブジェクトのContext
-	const [authenicated] = useAuthState(auth) //Firebase Authで認証済みかどうかのステート
+	const [isAuthenicated, setAuthenicated] = useState<undefined|boolean>(undefined) //ログインされているか否か
+
+	useEffect(() => {
+		const unsubscribe = onAuthStateChanged(auth, (user) => {
+			if(user){
+				setAuthenicated(true)
+				console.log("ユーザー情報なんだぞー")
+				console.log(user)
+			}else{
+				setAuthenicated(false)
+				console.log("User is signed out")
+			}
+		})
+
+		return (() => {
+			unsubscribe()
+		})
+	}, [])
 
 	useEffect(() => {
 		socket.on("connection", (res: string) => {
@@ -63,9 +85,9 @@ const Index: NextPage = () => {
 		}
 	}, [UNIXTime])
 
-	if(authenicated){ //通常のZEUSポータルを表示
+	if(isAuthenicated){ //通常のZEUSポータルを表示
 		return (
-			<Box minHeight="100vh" bg="#f0f0f0" position="relative">
+			<Box className="animate__animated animate__fadeIn" minHeight="100vh" bg="#f0f0f0" position="relative">
 				<Head>
 					<title>ZEUS</title>
 					<meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -96,7 +118,7 @@ const Index: NextPage = () => {
 					</SimpleGrid>
 	
 					<Center bg="gray.300">フッター</Center>
-					<Text display="inline-block">{`Responsive: ${useResponsive()}`}</Text>&nbsp;&nbsp;&nbsp;<Text display="inline-block">{`Touchable: ${useTouchDevice() ? "Yes" : "No"}`}</Text>
+					<Text display="inline-block">{`Responsive: ${responsiveType}`}</Text>&nbsp;&nbsp;&nbsp;<Text display="inline-block">{`Touchable: ${isTouchDevice ? "Yes" : "No"}`}</Text><Button size="xs" ml={4} colorScheme="teal" onClick={() => auth.signOut()}>SignOut</Button>
 				</Container>
 				
 				<Box position="absolute" bottom={{base: 5, md: 19, lg: 30}} right={{base: 5, md: 19, lg: 30}} height={{base: 120, md: 160, lg: 200}} width={{base: 86, md: 114, lg: 143}} style={{transform: "rotate(15deg)"}}>
@@ -104,21 +126,13 @@ const Index: NextPage = () => {
 				</Box>
 			</Box>
 		)
-	}else{ //ログイン・登録ページを表示
-		return(
-			<Flex minHeight="100vh" bg="#f0f0f0" justifyContent="center" alignItems="center">
-				<Box p={{base: "2rem", md: "3rem", lg: "4rem"}} bg="white" shadow="2xl" borderRadius={15}>
-					<Image src="/zeus.svg" width={269} height={70} />
-					<Text className="ksb" textAlign="center"fontSize="0.9rem" >全知の神の救済はここから始まる...</Text>
-						<Flex justifyContent="space-around" my={7} transition="0.4s all ease-out" _hover={{bg: "#ffffff", boxShadow: "5px 5px 11px #dedede, -5px -5px 11px #ffffff"}} alignItems="center" px={5} py={3} borderRadius={20} cursor="pointer">
-							<Image src="/google.svg" width={28} height={28} />
-							<Text className="ksb" ml={2}>Googleで登録・ログイン</Text>
-						</Flex>
-					<Center>
-						<Text className="ksb" fontSize="0.7rem" textAlign="center">登録には&nbsp;neec.ac.jp&nbsp;ドメインの<br />Googleアカウントが必要です</Text>
-					</Center>
-				</Box>
-				
+	}else if(isAuthenicated === false){ //ログイン・登録ページを表示
+		return <SignInWithGoogle />
+	}else{ //ローディング画面(Firebase Authの認証情報取得待ち)
+		return (
+			<Flex minHeight="100vh" bg="#f0f0f0" justifyContent="center" alignItems="center" flexFlow="column">
+				<Image src="/loading.svg" width={150} height={33} />
+				<Text className="sbei blink" fontSize="1.5rem" textAlign="center">Loading...!</Text>				
 			</Flex>
 		)
 	}

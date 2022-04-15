@@ -41,6 +41,11 @@ p {
 	src: url(/fonts/rounded-mplus-1c-bold.woff2);
 }
 
+@font-face {
+	font-family: "seanbecker-extrabold-italic";
+	src: url(/fonts/seanbecker-extrabold-italic.woff2);
+}
+
 .kb {
 	font-family: "Kazesawa-Bold";
 }
@@ -55,6 +60,10 @@ p {
 
 .rmb {
 	font-family: "Rounded-MPlus-1C-Bold";
+}
+
+.sbei {
+	font-family: "seanbecker-extrabold-italic";
 }
 
 /* 時計の下線 */
@@ -110,4 +119,14 @@ p {
 	border-radius: 20px;            
 	box-shadow: inset 0 0 10px 10px #909090;
 	border: solid 4px transparent;
+}
+
+/* 点滅 */
+.blink {
+	animation: blinking 0.4s ease-in-out infinite alternate;
+}
+ 
+@keyframes blinking {
+	0% {opacity: 0;}
+	100% {opacity: 1;}
 }

@@ -25,9 +25,9 @@
     "react": "17.0.2",
     "react-circular-progressbar": "^2.0.4",
     "react-dom": "17.0.2",
-    "react-firebase-hooks": "^5.0.3",
     "socket.io-client": "^4.4.1",
     "swr": "^1.2.2",
+    "windups": "^1.2.0",
     "yarn": "^1.22.17"
   },
   "devDependencies": {

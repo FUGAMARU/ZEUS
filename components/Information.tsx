@@ -7,9 +7,6 @@ import { Box, VStack, StackDivider, Modal, ModalOverlay, ModalContent, ModalHead
 //Custom Components
 import ListHeading from "./ListHeading"
 
-//Libraries
-import "animate.css"
-
 const Information = () => {
 	const { isOpen, onOpen, onClose } = useDisclosure()
 	const [modalHeader, setModalHeader] = useState("")
