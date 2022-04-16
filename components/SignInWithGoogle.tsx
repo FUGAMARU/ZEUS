@@ -3,20 +3,34 @@ import { useState } from "react"
 
 //Next.js Components
 import Image from "next/image"
+import Router from "next/router"
 
 //Chakra UI Components
 import { Flex, Box, Text, Center} from "@chakra-ui/react"
 
 //Libraries
-import { signInWithPopup } from "firebase/auth"
+import { signInWithPopup, getAdditionalUserInfo } from "firebase/auth"
 import { useWindupString, WindupChildren, Pace } from "windups"
 
 //Settings
 import { auth, provider } from "../firebase"
 
-const SignInWithGoogle = () => {
-	const signInWithGoogle = () => {
-		signInWithPopup(auth, provider)
+interface Props {
+	switchRegistered: Function
+}
+
+const SignInWithGoogle = (props: Props) => {
+	const signInWithGoogle = async () => {
+		await signInWithPopup(auth, provider)
+		.then((res) => {
+			if(getAdditionalUserInfo(res)?.isNewUser){ //登録
+				//ユーザー情報登録ページに遷移
+				Router.push("/register")
+			}
+		})
+		.catch((e) => {
+			console.log(`Googleログインエラー: ${e}`)
+		})
 	}
 	
 	const [sloganText] = useWindupString("全知の神の救済はここから始まる...")
@@ -31,7 +45,7 @@ const SignInWithGoogle = () => {
 
 	return (
 		<Flex minHeight="100vh" bg="#f0f0f0" justifyContent="center" alignItems="center">
-			<Box className="animate__animated animate__fadeIn animate__slow" onAnimationEnd={animationController} p={{base: "2rem", md: "3rem", lg: "4rem"}} bg="white" shadow="2xl" borderRadius={15}>
+			<Box className="animate__animated animate__fadeIn animate__slow" onAnimationEnd={animationController} p={{base: "2rem", md: "3rem", lg: "4rem"}} bg="white" shadow="2xl" borderRadius={15} borderTop="solid 5px #5fc2c5">
 				<Image className="animate__animated animate__fadeInUp animate__delay-1s" src="/zeus.svg" width={269} height={70} />
 				<Text className="ksb" textAlign="center"fontSize="0.9rem" h="1rem" >
 					{sloganElements}

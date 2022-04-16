@@ -10,6 +10,7 @@ import useUNIXTime from "../hooks/useUNIXTime"
 import Head from "next/head"
 import type { NextPage } from "next"
 import Image from "next/image"
+import Router from "next/router"
 
 //Chakra UI Components
 import { Container, Box, Center, SimpleGrid, Text, Flex, Button } from "@chakra-ui/react"
@@ -42,17 +43,30 @@ const Index: NextPage = () => {
 	const [localUNIXTime, setLocalUnixTime] = useState(0) //UNIXタイムスタンプ(1秒ごとに自動更新)
 	const [isClockStarted, setClockStarted] = useState(false) //UNIXタイムスタンプのカウントアップがスタートしているか
 	const socket = useContext(SocketContext) //Socket.IOオブジェクトのContext
-	const [isAuthenicated, setAuthenicated] = useState<undefined|boolean>(undefined) //ログインされているか否か
+	const [isAuthenicated, setAuthenicated] = useState<null|boolean>(null) //ログインされているか否か
+	const [isRegistered, setRegistered] = useState<null|boolean>(null) //新規登録画面に遷移する時にポータルが一瞬見えるのを防ぐ
+
+	const switchRegistered = (arg: boolean) => {
+		setAuthenicated(arg)
+	}
 
 	useEffect(() => {
+		//Firebaseに登録されてるけどFirestoreにユーザー情報がない場合の条件分岐はここに書く
+		setRegistered(false) //ユーザー情報の登録が完了していない仮定
+
 		const unsubscribe = onAuthStateChanged(auth, (user) => {
 			if(user){
-				setAuthenicated(true)
-				console.log("ユーザー情報なんだぞー")
-				console.log(user)
-			}else{
+				if(isRegistered){ //ログインされている状態でユーザー情報の登録まで済んでいる
+					setAuthenicated(true)
+					console.log("ユーザー情報なんだぞー")
+					console.log(user)
+				}else{ //ログインされている状態だけどユーザー情報の登録は済んでいない
+					setAuthenicated(null) //ローディング画面を表示させて
+					Router.push("/register") //登録画面に遷移させる
+				}
+			}else{ //ログインされていない→ユーザー情報の登録が済んでいるはずがない
 				setAuthenicated(false)
-				console.log("User is signed out")
+				console.log("ログインされていません")
 			}
 		})
 
@@ -127,14 +141,16 @@ const Index: NextPage = () => {
 			</Box>
 		)
 	}else if(isAuthenicated === false){ //ログイン・登録ページを表示
-		return <SignInWithGoogle />
-	}else{ //ローディング画面(Firebase Authの認証情報取得待ち)
+		return <SignInWithGoogle switchRegistered={switchRegistered} />
+	}else if(isAuthenicated === null){ //ローディング画面(Firebase Authの認証情報取得待ち)
 		return (
 			<Flex minHeight="100vh" bg="#f0f0f0" justifyContent="center" alignItems="center" flexFlow="column">
 				<Image src="/loading.svg" width={150} height={33} />
 				<Text className="sbei blink" fontSize="1.5rem" textAlign="center">Loading...!</Text>				
 			</Flex>
 		)
+	}else{
+		return null
 	}
 }
 
