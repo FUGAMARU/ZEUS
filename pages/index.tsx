@@ -26,6 +26,7 @@ import Chat from "../components/Chat"
 import BBS from "../components/BBS"
 import Information from "../components/Information"
 import SignInWithGoogle from "../components/SignInWithGoogle"
+import Loading from "../components/Loading"
 
 //Libraries
 import { onAuthStateChanged } from "firebase/auth"
@@ -61,6 +62,8 @@ const Index: NextPage = () => {
 					console.log("ユーザー情報なんだぞー")
 					console.log(user)
 				}else{ //ログインされている状態だけどユーザー情報の登録は済んでいない
+					console.log("ユーザー情報")
+					console.log(user)
 					setAuthenicated(null) //ローディング画面を表示させて
 					Router.push("/register") //登録画面に遷移させる
 				}
@@ -143,12 +146,7 @@ const Index: NextPage = () => {
 	}else if(isAuthenicated === false){ //ログイン・登録ページを表示
 		return <SignInWithGoogle switchRegistered={switchRegistered} />
 	}else if(isAuthenicated === null){ //ローディング画面(Firebase Authの認証情報取得待ち)
-		return (
-			<Flex minHeight="100vh" bg="#f0f0f0" justifyContent="center" alignItems="center" flexFlow="column">
-				<Image src="/loading.svg" width={150} height={33} />
-				<Text className="sbei blink" fontSize="1.5rem" textAlign="center">Loading...!</Text>				
-			</Flex>
-		)
+		return <Loading />
 	}else{
 		return null
 	}
