@@ -15,6 +15,8 @@ import Loading from "../components/Loading"
 //Libraries
 import { useWindupString, WindupChildren, Pace } from "windups"
 import { onAuthStateChanged } from "firebase/auth"
+
+//Settings
 import { auth } from "../firebase"
 
 const Register: NextPage = () => {
@@ -22,8 +24,8 @@ const Register: NextPage = () => {
 	const [campus, setCampus] = useState("kamata") //キャンパス選択ラジオボタン用state
 	const [accountType, setAccountType] = useState("student") //アカウントタイプ選択ラジオボタン用state
 
-	//未ログイン状態でregister.tsx開いたらトップページに飛ばす
 	useEffect(() => {
+		//未ログイン状態でregister.tsx開いたらトップページに飛ばす
 		const unsubscribe = onAuthStateChanged(auth, (user) => {
 			if(user){
 				setDisplayState(true)

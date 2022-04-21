@@ -1,8 +1,9 @@
 import { getApps, initializeApp } from "firebase/app"
 //import { getAnalytics } from "firebase/analytics"
 import { getAuth } from "firebase/auth"
-import { GoogleAuthProvider, onAuthStateChanged } from "firebase/auth"
+import { GoogleAuthProvider } from "firebase/auth"
 import { getStorage, ref, uploadBytes } from "firebase/storage"
+import { doc, getDoc, getFirestore } from "firebase/firestore"
 
 const firebaseConfig = {
 	apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -17,7 +18,7 @@ const firebaseConfig = {
 
 let app
 if(getApps().length < 1){
-	app = initializeApp(firebaseConfig);
+	app = initializeApp(firebaseConfig)
 }
 //const app = initializeApp(firebaseConfig)
 //const analytics = getAnalytics(app)
@@ -27,11 +28,29 @@ const provider = new GoogleAuthProvider()
 
 const storage = getStorage(app)
 
-const uploadImage = (uid:string, file: Blob) => {
-	const profileIconRef = ref(storage, `user-icon/${uid}.jpg`)
-	uploadBytes(profileIconRef, file).then((snapshot) => {
-		console.log("アイコン画像をFirebase Cloud Storageにアップロードしました");
-	})
+const uploadImage = async (uid:string, file: Blob) => {
+	try{
+		await uploadBytes(ref(storage, `user-icon/${uid}.jpg`), file).then((snapshot) => {
+			console.log("アイコン画像をFirebase Cloud Storageにアップロードしました")
+			console.log(snapshot)
+		})
+	}catch{
+		console.log("アイコン画像のFirebase Cloud Storageアップロード時にエラーが発生しました")
+	}
 }
 
-export { auth, provider, uploadImage }
+const db = getFirestore(app)
+const checkUserExists = async (uid: string) => {
+	const studentsDoc = await getDoc(doc(db, "students", uid))
+	const teachersDoc = await getDoc(doc(db, "teachers", uid))
+
+	if(studentsDoc.exists() || teachersDoc.exists()){
+		console.log("Firestoreに該当ユーザーデーターあり")
+		return true
+	}else{
+		console.log("Firestoreに該当ユーザーデーターなし")
+		return false
+	}
+}
+
+export { auth, provider, uploadImage, checkUserExists }

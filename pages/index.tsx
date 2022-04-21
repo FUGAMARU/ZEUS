@@ -35,7 +35,7 @@ import { onAuthStateChanged } from "firebase/auth"
 import { SocketContext } from "../contexts/SocketIO"
 
 //Settings
-import { auth } from "../firebase"
+import { auth, checkUserExists } from "../firebase"
 
 const Index: NextPage = () => {
 	const responsiveType = useResponsive() //リアクティブな画面幅タイプの変数
@@ -45,28 +45,28 @@ const Index: NextPage = () => {
 	const [isClockStarted, setClockStarted] = useState(false) //UNIXタイムスタンプのカウントアップがスタートしているか
 	const socket = useContext(SocketContext) //Socket.IOオブジェクトのContext
 	const [isAuthenicated, setAuthenicated] = useState<null|boolean>(null) //ログインされているか否か
-	const [isRegistered, setRegistered] = useState<null|boolean>(null) //新規登録画面に遷移する時にポータルが一瞬見えるのを防ぐ
 
 	const switchRegistered = (arg: boolean) => {
 		setAuthenicated(arg)
 	}
 
 	useEffect(() => {
-		//Firebaseに登録されてるけどFirestoreにユーザー情報がない場合の条件分岐はここに書く
-		setRegistered(false) //ユーザー情報の登録が完了していない仮定
-
 		const unsubscribe = onAuthStateChanged(auth, (user) => {
 			if(user){
-				if(isRegistered){ //ログインされている状態でユーザー情報の登録まで済んでいる
-					setAuthenicated(true)
-					console.log("ユーザー情報なんだぞー")
-					console.log(user)
-				}else{ //ログインされている状態だけどユーザー情報の登録は済んでいない
-					console.log("ユーザー情報")
-					console.log(user)
-					setAuthenicated(null) //ローディング画面を表示させて
-					Router.push("/register") //登録画面に遷移させる
-				}
+				(async() => {
+					//Firestoreにユーザー情報が登録されているかどうか
+					const userExists = await checkUserExists(user.uid)
+					if(userExists){ //ログインされている状態でユーザー情報の登録まで済んでいる
+						setAuthenicated(true)
+						console.log("=====ユーザー情報=====")
+						console.log(user)
+					}else{ //ログインされている状態だけどユーザー情報の登録は済んでいない
+						console.log("=====ユーザー情報=====")
+						console.log(user)
+						setAuthenicated(null) //ローディング画面を表示させて
+						Router.push("/register") //登録画面に遷移させる
+					}
+				})()
 			}else{ //ログインされていない→ユーザー情報の登録が済んでいるはずがない
 				setAuthenicated(false)
 				console.log("ログインされていません")
