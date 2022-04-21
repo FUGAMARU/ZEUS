@@ -2,8 +2,9 @@ import { getApps, initializeApp } from "firebase/app"
 //import { getAnalytics } from "firebase/analytics"
 import { getAuth } from "firebase/auth"
 import { GoogleAuthProvider } from "firebase/auth"
-import { getStorage, ref, uploadBytes } from "firebase/storage"
-import { doc, getDoc, getFirestore } from "firebase/firestore"
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
+import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore"
+import { resolve } from "path"
 
 const firebaseConfig = {
 	apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -25,22 +26,10 @@ if(getApps().length < 1){
 
 const auth = getAuth(app)
 const provider = new GoogleAuthProvider()
-
 const storage = getStorage(app)
-
-const uploadImage = async (uid:string, file: Blob) => {
-	try{
-		await uploadBytes(ref(storage, `user-icon/${uid}.jpg`), file).then((snapshot) => {
-			console.log("アイコン画像をFirebase Cloud Storageにアップロードしました")
-			console.log(snapshot)
-		})
-	}catch{
-		console.log("アイコン画像のFirebase Cloud Storageアップロード時にエラーが発生しました")
-	}
-}
-
 const db = getFirestore(app)
-const checkUserExists = async (uid: string) => {
+
+const checkUserDataExists = async (uid: string) => {
 	const studentsDoc = await getDoc(doc(db, "students", uid))
 	const teachersDoc = await getDoc(doc(db, "teachers", uid))
 
@@ -53,4 +42,47 @@ const checkUserExists = async (uid: string) => {
 	}
 }
 
-export { auth, provider, uploadImage, checkUserExists }
+interface UserData {
+	name: string,
+	class: string,
+	iconSrc?: string,
+	message?: string,
+	snsLinks?: string[]
+}
+
+const registerUserInformation = (uid: string, accountType: string, userData: UserData, userIcon: any) => {
+	console.log("======================")
+	console.log(uid)
+	console.log(accountType)
+	console.log(userData)
+	const docRef = accountType === "student" ? doc(db, "students", uid) : doc(db, "teachers", uid)
+
+	return new Promise(async (resolve, reject) => {
+		if(userIcon === null){
+			userData.iconSrc = "https://firebasestorage.googleapis.com/v0/b/zeus-9bc47.appspot.com/o/user-icon%2Fnoicon.png?alt=media&token=385aba6d-1124-462d-acd2-972d36fd9fec"
+		}else{
+			try{
+				const snapshot = await uploadBytes(ref(storage, `user-icon/${uid}.jpg`), userIcon)
+				const iconSrcURL = await getDownloadURL(snapshot.ref)
+				console.log(`アップロード完了！ => ${iconSrcURL}`)
+				userData.iconSrc = iconSrcURL
+			}catch{
+				console.log("ユーザーアイコンアップロード時にエラーが発生しました")
+				reject()
+			}
+		}
+	
+		try{
+			userData.message = ""
+			userData.snsLinks = []
+			await setDoc(docRef, userData)
+			console.log("ユーザー情報登録完了")
+			resolve("ユーザー情報登録完了")
+		}catch{
+			console.log("ユーザー情報登録時にエラーが発生しました")
+			reject()
+		}
+	})
+}
+
+export { auth, provider, checkUserDataExists, registerUserInformation }

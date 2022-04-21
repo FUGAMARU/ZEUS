@@ -35,7 +35,7 @@ import { onAuthStateChanged } from "firebase/auth"
 import { SocketContext } from "../contexts/SocketIO"
 
 //Settings
-import { auth, checkUserExists } from "../firebase"
+import { auth, checkUserDataExists } from "../firebase"
 
 const Index: NextPage = () => {
 	const responsiveType = useResponsive() //リアクティブな画面幅タイプの変数
@@ -54,15 +54,13 @@ const Index: NextPage = () => {
 		const unsubscribe = onAuthStateChanged(auth, (user) => {
 			if(user){
 				(async() => {
+					console.log("=====ユーザー情報=====")
+					console.log(user)
 					//Firestoreにユーザー情報が登録されているかどうか
-					const userExists = await checkUserExists(user.uid)
+					const userExists = await checkUserDataExists(user.uid)
 					if(userExists){ //ログインされている状態でユーザー情報の登録まで済んでいる
 						setAuthenicated(true)
-						console.log("=====ユーザー情報=====")
-						console.log(user)
 					}else{ //ログインされている状態だけどユーザー情報の登録は済んでいない
-						console.log("=====ユーザー情報=====")
-						console.log(user)
 						setAuthenicated(null) //ローディング画面を表示させて
 						Router.push("/register") //登録画面に遷移させる
 					}
