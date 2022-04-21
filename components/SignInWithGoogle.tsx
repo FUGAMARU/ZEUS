@@ -9,7 +9,7 @@ import Router from "next/router"
 import { Flex, Box, Text, Center} from "@chakra-ui/react"
 
 //Libraries
-import { signInWithPopup, getAdditionalUserInfo } from "firebase/auth"
+import { signInWithPopup, getAdditionalUserInfo, deleteUser, User } from "firebase/auth"
 import { useWindupString, WindupChildren, Pace } from "windups"
 
 //Settings
@@ -21,16 +21,22 @@ interface Props {
 
 const SignInWithGoogle = (props: Props) => {
 	const signInWithGoogle = async () => {
-		await signInWithPopup(auth, provider)
-		.then((res) => {
-			if(getAdditionalUserInfo(res)?.isNewUser){ //登録
-				//ユーザー情報登録ページに遷移
-				Router.push("/register")
+		try{
+			const res = await signInWithPopup(auth, provider)
+			if(res.user.email?.match(/neec.ac.jp/)){ //学校のメアドか？
+				if(getAdditionalUserInfo(res)?.isNewUser){ //登録
+					//ユーザー情報登録ページに遷移
+					Router.push("/register")
+				}
+			}else{
+				//学校のメアドじゃないからユーザー削除
+				const user = auth.currentUser
+				if(user) await deleteUser(user)
+				Router.push("/")
 			}
-		})
-		.catch((e) => {
-			console.log(`Googleログインエラー: ${e}`)
-		})
+		}catch{
+			console.log("Googleログインエラー")
+		}
 	}
 	
 	const [sloganText] = useWindupString("全知の神の救済はここから始まる...")
