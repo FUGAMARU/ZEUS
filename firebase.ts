@@ -4,7 +4,6 @@ import { getAuth } from "firebase/auth"
 import { GoogleAuthProvider } from "firebase/auth"
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
 import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore"
-import { resolve } from "path"
 
 const firebaseConfig = {
 	apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -85,4 +84,19 @@ const registerUserInformation = (uid: string, accountType: string, userData: Use
 	})
 }
 
-export { auth, provider, checkUserDataExists, registerUserInformation }
+const getUserData = (uid: string): Promise<any> => {
+	return new Promise(async (resolve) => {
+		const studentsDoc = await getDoc(doc(db, "students", uid))
+		const teachersDoc = await getDoc(doc(db, "teachers", uid))
+
+		if(studentsDoc.exists()){
+			const docData = studentsDoc.data()
+			resolve(docData)
+		}else if(teachersDoc.exists()){
+			const docData = teachersDoc.data()
+			resolve(docData)
+		}
+	})
+}
+
+export { auth, provider, checkUserDataExists, registerUserInformation, getUserData }

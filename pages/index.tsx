@@ -35,7 +35,7 @@ import { onAuthStateChanged } from "firebase/auth"
 import { SocketContext } from "../contexts/SocketIO"
 
 //Settings
-import { auth, checkUserDataExists } from "../firebase"
+import { auth, checkUserDataExists, getUserData } from "../firebase"
 
 const Index: NextPage = () => {
 	const responsiveType = useResponsive() //リアクティブな画面幅タイプの変数
@@ -45,6 +45,8 @@ const Index: NextPage = () => {
 	const [isClockStarted, setClockStarted] = useState(false) //UNIXタイムスタンプのカウントアップがスタートしているか
 	const socket = useContext(SocketContext) //Socket.IOオブジェクトのContext
 	const [isAuthenicated, setAuthenicated] = useState<null|boolean>(null) //ログインされているか否か
+	const [userName, setUserName] = useState("") //ユーザー名
+	const [userIconSrc, setUserIconSrc] = useState("") //ユーザーアイコンの画像URL
 
 	const switchRegistered = (arg: boolean) => {
 		setAuthenicated(arg)
@@ -60,6 +62,10 @@ const Index: NextPage = () => {
 					const userExists = await checkUserDataExists(user.uid)
 					if(userExists){ //ログインされている状態でユーザー情報の登録まで済んでいる
 						setAuthenicated(true)
+						const res = await getUserData(user.uid)
+						setUserName(res.name)
+						setUserIconSrc(res.iconSrc)
+						
 					}else{ //ログインされている状態だけどユーザー情報の登録は済んでいない
 						setAuthenicated(null) //ローディング画面を表示させて
 						Router.push("/register") //登録画面に遷移させる
@@ -118,7 +124,7 @@ const Index: NextPage = () => {
 							<Image src="/zeus.svg" width={269} height={70} />
 						</Center>
 						<Center>
-							<UserInfo />
+							<UserInfo userName={userName} userIconSrc={userIconSrc} />
 						</Center>	
 					</SimpleGrid>
 	
