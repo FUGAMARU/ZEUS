@@ -13,7 +13,7 @@ import Image from "next/image"
 import Router from "next/router"
 
 //Chakra UI Components
-import { Container, Box, Center, SimpleGrid, Text, Flex, Button } from "@chakra-ui/react"
+import { Container, Box, Center, SimpleGrid, Text } from "@chakra-ui/react"
 
 //Custom Components
 import Clock from "../components/Clock"
@@ -29,13 +29,11 @@ import SignInWithGoogle from "../components/SignInWithGoogle"
 import Loading from "../components/Loading"
 
 //Libraries
+import { auth, checkUserDataExists, getUserData } from "../firebase"
 import { onAuthStateChanged } from "firebase/auth"
 
 //Contexts
 import { SocketContext } from "../contexts/SocketIO"
-
-//Settings
-import { auth, checkUserDataExists, getUserData } from "../firebase"
 
 const Index: NextPage = () => {
 	const responsiveType = useResponsive() //リアクティブな画面幅タイプの変数
@@ -44,7 +42,7 @@ const Index: NextPage = () => {
 	const [localUNIXTime, setLocalUnixTime] = useState(0) //UNIXタイムスタンプ(1秒ごとに自動更新)
 	const [isClockStarted, setClockStarted] = useState(false) //UNIXタイムスタンプのカウントアップがスタートしているか
 	const socket = useContext(SocketContext) //Socket.IOオブジェクトのContext
-	const [isAuthenicated, setAuthenicated] = useState<null|boolean>(null) //ログインされているか否か
+	const [isAuthenicated, setAuthenicated] = useState<null|boolean>(null) //ログインされているか否か True => 通常のZEUSポータル, False => ログイン・登録ページ, null => ローディング画面
 	const [userName, setUserName] = useState("") //ユーザー名
 	const [userIconSrc, setUserIconSrc] = useState("") //ユーザーアイコンの画像URL
 
@@ -61,11 +59,10 @@ const Index: NextPage = () => {
 					//Firestoreにユーザー情報が登録されているかどうか
 					const userExists = await checkUserDataExists(user.uid)
 					if(userExists){ //ログインされている状態でユーザー情報の登録まで済んでいる
-						setAuthenicated(true)
 						const res = await getUserData(user.uid)
 						setUserName(res.name)
 						setUserIconSrc(res.iconSrc)
-						
+						setAuthenicated(true)	
 					}else{ //ログインされている状態だけどユーザー情報の登録は済んでいない
 						setAuthenicated(null) //ローディング画面を表示させて
 						Router.push("/register") //登録画面に遷移させる
@@ -139,7 +136,7 @@ const Index: NextPage = () => {
 					</SimpleGrid>
 	
 					<Center bg="gray.300">フッター</Center>
-					<Text display="inline-block">{`Responsive: ${responsiveType}`}</Text>&nbsp;&nbsp;&nbsp;<Text display="inline-block">{`Touchable: ${isTouchDevice ? "Yes" : "No"}`}</Text><Button size="xs" ml={4} colorScheme="teal" onClick={() => auth.signOut()}>SignOut</Button>
+					<Text display="inline-block">{`Responsive: ${responsiveType}`}</Text>&nbsp;&nbsp;&nbsp;<Text display="inline-block">{`Touchable: ${isTouchDevice ? "Yes" : "No"}`}</Text>
 				</Container>
 				
 				<Box position="absolute" bottom={{base: 5, md: 19, lg: 30}} right={{base: 5, md: 19, lg: 30}} height={{base: 120, md: 160, lg: 200}} width={{base: 86, md: 114, lg: 143}} style={{transform: "rotate(15deg)"}}>
