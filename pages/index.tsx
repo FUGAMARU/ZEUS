@@ -38,16 +38,14 @@ import { SocketContext } from "../contexts/SocketIO"
 const Index: NextPage = () => {
 	const responsiveType = useResponsive() //リアクティブな画面幅タイプの変数
 	const isTouchDevice = useTouchDevice() //タッチ可能かどうか
-	const { UNIXTime, isUNIXTimeLoading, isUNXITimeError } = useUNIXTime()
-	const [localUNIXTime, setLocalUnixTime] = useState(0) //UNIXタイムスタンプ(1秒ごとに自動更新)
-	const [isClockStarted, setClockStarted] = useState(false) //UNIXタイムスタンプのカウントアップがスタートしているか
+	const { localUNIXTime } = useUNIXTime()
 	const socket = useContext(SocketContext) //Socket.IOオブジェクトのContext
 	const [isAuthenicated, setAuthenicated] = useState<null|boolean>(null) //ログインされているか否か True => 通常のZEUSポータル, False => ログイン・登録ページ, null => ローディング画面
 	const [userName, setUserName] = useState("") //ユーザー名
 	const [userIconSrc, setUserIconSrc] = useState("") //ユーザーアイコンの画像URL
 
-	const switchRegistered = (arg: boolean) => {
-		setAuthenicated(arg)
+	const switchRegistered = (sw: boolean) => {
+		setAuthenicated(sw)
 	}
 
 	useEffect(() => {
@@ -62,7 +60,7 @@ const Index: NextPage = () => {
 						const res = await getUserData(user.uid)
 						setUserName(res.name)
 						setUserIconSrc(res.iconSrc)
-						setAuthenicated(true)	
+						setAuthenicated(true) //ローディング画面解除
 					}else{ //ログインされている状態だけどユーザー情報の登録は済んでいない
 						setAuthenicated(null) //ローディング画面を表示させて
 						Router.push("/register") //登録画面に遷移させる
@@ -86,23 +84,6 @@ const Index: NextPage = () => {
 		})
 	}, [socket])
 
-	useEffect(() => {
-		console.log("UNIXタイムスタンプ新規受信")
-		console.log(UNIXTime)
-		if(UNIXTime){
-			if(isClockStarted === false){
-				setLocalUnixTime(UNIXTime + 1)
-				setClockStarted(true)
-				setInterval(() => {
-					setLocalUnixTime(prev => prev + 1)
-				}, 1000)
-			}else{
-				setLocalUnixTime(UNIXTime + 1)
-				console.log(`時刻合わせ完了 - ${new Date(UNIXTime * 1000).toString()}`)
-			}
-		}
-	}, [UNIXTime])
-
 	if(isAuthenicated){ //通常のZEUSポータルを表示
 		return (
 			<Box className="animate__animated animate__fadeIn" minHeight="100vh" bg="#f0f0f0" position="relative">
@@ -115,7 +96,7 @@ const Index: NextPage = () => {
 				<Container maxW="1280px" px={0}>
 					<SimpleGrid columns={3} spacing={0}>
 						<Center>
-							{isUNIXTimeLoading ? <p className="kb">現在時刻取得中…</p> : isUNXITimeError ? <p className="kb">時刻取得エラー</p> : <Clock UNIXTime={localUNIXTime} />}
+							{localUNIXTime === 0 ? <p className="kb">現在時刻取得中…</p> : localUNIXTime === -1 ? <p className="kb">時刻取得エラー</p> : <Clock UNIXTime={localUNIXTime} />}
 						</Center>
 						<Center>
 							<Image src="/zeus.svg" width={269} height={70} />
