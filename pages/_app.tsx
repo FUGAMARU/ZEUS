@@ -1,6 +1,7 @@
 import { useEffect } from "react"
 import "../styles/globals.css"
 import "animate.css"
+import Head from "next/head"
 import type { AppProps } from "next/app"
 import { ChakraProvider } from "@chakra-ui/react"
 import { SocketContext, socket } from "../contexts/SocketIO"
@@ -15,11 +16,18 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
 	}, [])
 
 	return (
-		<ChakraProvider>
-			<SocketContext.Provider value={socket}>
-				<Component {...pageProps} />
-			</SocketContext.Provider>
-		</ChakraProvider>
+		<>
+			<Head>
+				<title>ZEUS</title>	
+				<meta httpEquiv="content-language" content="ja"></meta>
+				<meta name="viewport" content="initial-scale=1.0, width=device-width" />
+			</Head>
+			<ChakraProvider>
+				<SocketContext.Provider value={socket}>
+					<Component {...pageProps} />
+				</SocketContext.Provider>
+			</ChakraProvider>
+		</>
 	)
 }
 

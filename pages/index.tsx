@@ -7,7 +7,6 @@ import { useTouchDevice } from "../hooks/useTouchDevice"
 import useUNIXTime from "../hooks/useUNIXTime"
 
 //Next.js Components
-import Head from "next/head"
 import type { NextPage } from "next"
 import Image from "next/image"
 import Router from "next/router"
@@ -89,10 +88,6 @@ const Index: NextPage = () => {
 	if(isAuthenicated){ //通常のZEUSポータルを表示
 		return (
 			<Box className="animate__animated animate__fadeIn" minHeight="100vh" bg="#f0f0f0" position="relative">
-				<Head>
-					<title>ZEUS</title>
-					<meta name="viewport" content="initial-scale=1.0, width=device-width" />
-				</Head>
 				{/*base => スマホ / md => タブレット / lg => PC*/}
 				<Box h="0.5rem"></Box>
 				<Container maxW="1280px" px={0}>
