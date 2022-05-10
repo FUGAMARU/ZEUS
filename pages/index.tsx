@@ -13,7 +13,7 @@ import Image from "next/image"
 import Router from "next/router"
 
 //Chakra UI Components
-import { Container, Box, Center, SimpleGrid, Text } from "@chakra-ui/react"
+import { Container, Box, Center, SimpleGrid, Text, Button } from "@chakra-ui/react"
 
 //Custom Components
 import Clock from "../components/Clock"
@@ -39,6 +39,7 @@ const Index: NextPage = () => {
 	const responsiveType = useResponsive() //リアクティブな画面幅タイプの変数
 	const isTouchDevice = useTouchDevice() //タッチ可能かどうか
 	const { localUNIXTime } = useUNIXTime()
+	const [UID, setUID] = useState("") //ログイン中ユーザーのUID
 	const socket = useContext(SocketContext) //Socket.IOオブジェクトのContext
 	const [isAuthenicated, setAuthenicated] = useState<null|boolean>(null) //ログインされているか否か True => 通常のZEUSポータル, False => ログイン・登録ページ, null => ローディング画面
 	const [userName, setUserName] = useState("") //ユーザー名
@@ -60,6 +61,7 @@ const Index: NextPage = () => {
 						const res = await getUserData(user.uid)
 						setUserName(res.name)
 						setUserIconSrc(res.iconSrc)
+						setUID(user.uid)
 						setAuthenicated(true) //ローディング画面解除
 					}else{ //ログインされている状態だけどユーザー情報の登録は済んでいない
 						setAuthenicated(null) //ローディング画面を表示させて
@@ -107,7 +109,7 @@ const Index: NextPage = () => {
 					</SimpleGrid>
 	
 					<SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={5} my={10} mx={3}>
-						<FunctionCard title="現在の授業" gradientStartHex="#dfec51" gradientEndHex="#73aa0a" childComponent={<CurrentClass />} />
+						<FunctionCard title="現在の授業" gradientStartHex="#dfec51" gradientEndHex="#73aa0a" childComponent={<CurrentClass UID={UID} />} />
 						<FunctionCard title="次の授業" gradientStartHex="#09e7d3" gradientEndHex="#008bb6" childComponent={<NextClass />} />
 						<FunctionCard title="FileDispenser" gradientStartHex="#ffd97b" gradientEndHex="#f6a742" childComponent={<FileDispenser />} />
 						<FunctionCard title="チャット" gradientStartHex="#09e863" gradientEndHex="#00b684" childComponent={<Chat />} />
@@ -117,7 +119,8 @@ const Index: NextPage = () => {
 					</SimpleGrid>
 	
 					<Center bg="gray.300">フッター</Center>
-					<Text display="inline-block">{`Responsive: ${responsiveType}`}</Text>&nbsp;&nbsp;&nbsp;<Text display="inline-block">{`Touchable: ${isTouchDevice ? "Yes" : "No"}`}</Text>
+					<Text display="inline-block">{`Responsive: ${responsiveType}`}</Text>&nbsp;&nbsp;&nbsp;<Text display="inline-block">{`Touchable: ${isTouchDevice ? "Yes" : "No"}`}</Text><br />
+					<Button size="xs" colorScheme="pink">Use Timemachine</Button>
 				</Container>
 				
 				<Box position="absolute" bottom={{base: 5, md: 19, lg: 30}} right={{base: 5, md: 19, lg: 30}} height={{base: 120, md: 160, lg: 200}} width={{base: 86, md: 114, lg: 143}} style={{transform: "rotate(15deg)"}}>

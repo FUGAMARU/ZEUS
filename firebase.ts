@@ -4,6 +4,7 @@ import { getAuth } from "firebase/auth"
 import { GoogleAuthProvider } from "firebase/auth"
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
 import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore"
+import { whattimeIsIt } from "./functions"
 
 const firebaseConfig = {
 	apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -99,4 +100,51 @@ const getUserData = (uid: string): Promise<any> => {
 	})
 }
 
-export { auth, provider, checkUserDataExists, registerUserInformation, getUserData }
+interface ObjectTypes {
+	name: string,
+	hours: string,
+	location: string,
+	teacher: string,
+	classroom: string,
+	zoom: string
+}
+
+const getLectureData = (target: string, uid: string, UNIXTime: number): Promise<any> => { //return => object, ""(授業未開講時)
+	return new Promise(async (resolve) => {
+		const hour = whattimeIsIt(UNIXTime) //今が何時限目なのか
+		if(hour === 0){ //授業未開講時
+			resolve("")
+		}else{
+			if(target === "current"){
+				//UIDから所属クラスを特定
+				const studentDoc = await getDoc(doc(db, "students", uid))
+				const studentData = studentDoc.data()
+				const classId: string = studentData?.class
+		
+				//クラスIDと現在の時間から授業IDを特定
+				const dayOfWeekStr = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"][new Date(UNIXTime * 1000).getDay()]
+				const classDoc = await getDoc(doc(db, "classes", classId))
+				const classData = classDoc.data()
+				let lectureID
+				if(classData) lectureID = classData["lectures"][dayOfWeekStr][hour - 1]
+	
+				//授業IDから授業情報を取得
+				const lectureDoc = await getDoc(doc(db, "lectures", lectureID))
+				const lectureData = lectureDoc.data()
+				if(lectureData === null){
+					resolve("")
+				}else{
+					resolve(lectureData)
+				}
+			}else if(target === "next"){
+				if(hour === 8){ //8時間目の次はない
+					resolve("")
+				}else{
+					//...
+				}
+			}
+		}
+	})
+}
+
+export { auth, provider, checkUserDataExists, registerUserInformation, getUserData, getLectureData }
