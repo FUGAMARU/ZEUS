@@ -125,16 +125,15 @@ const getLectureData = (target: string, uid: string, UNIXTime: number): Promise<
 				const dayOfWeekStr = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"][new Date(UNIXTime * 1000).getDay()]
 				const classDoc = await getDoc(doc(db, "classes", classId))
 				const classData = classDoc.data()
-				let lectureID
-				if(classData) lectureID = classData["lectures"][dayOfWeekStr][hour - 1]
-	
-				//授業IDから授業情報を取得
-				const lectureDoc = await getDoc(doc(db, "lectures", lectureID))
-				const lectureData = lectureDoc.data()
-				if(lectureData === null){
-					resolve("")
-				}else{
-					resolve(lectureData)
+				if(classData){
+					const lectureID: string|null = classData["lectures"][dayOfWeekStr][hour - 1]
+					//授業IDから授業情報を取得
+					if(lectureID === null){
+						resolve("")
+					}else{
+						const lectureDoc = await getDoc(doc(db, "lectures", lectureID))
+						resolve(lectureDoc.data())
+					}
 				}
 			}else if(target === "next"){
 				if(hour === 8){ //8時間目の次はない

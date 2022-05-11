@@ -28,7 +28,7 @@ interface Props {
 const CurrentClass = (props: Props) => {
 	const { localUNIXTime } = useUNIXTime()
 	const [UNIXTimeFlag, setUNIXTimeFlag] = useState(false) //UNIXTimeを正常に取得できたかどうか
-	const [percentage, setPercentage] = useState(0)
+	const [isNowNull, setNowNull] = useState(true) //現在の時間帯授業が未設定かどうか(授業IDがnullであったかどうか)
 
 	//カードに表示するデーター
 	const [lectureData, setLectureData] = useState({
@@ -39,6 +39,7 @@ const CurrentClass = (props: Props) => {
 		classroomLink: "https://classroom.google.com/",
 		zoomLink: "https://zoom.us/"
 	})
+	const [percentage, setPercentage] = useState(0)
 	const [remainingTime, setRemainingTime] = useState("0")
 	const [hourLabel, setHourLabel] = useState("取得中…")
 
@@ -61,6 +62,7 @@ const CurrentClass = (props: Props) => {
 							zoomLink: "https://zoom.us/"
 						})
 						setHourLabel("")
+						setNowNull(true)
 					}else{
 						setLectureData({
 							name: res.name,
@@ -71,16 +73,19 @@ const CurrentClass = (props: Props) => {
 							zoomLink: res.zoom
 						})
 						setHourLabel(String(whattimeIsIt(localUNIXTime) + "時限目"))
+						setNowNull(false)
 					}
 				}
 
-				const receivedRemainingTime = getRemainingTime(localUNIXTime)
-				if(receivedRemainingTime === -1){ //授業時間外の場合
-					setPercentage(0)
-					setRemainingTime("")
-				}else{
-					setPercentage(100 - Math.round(receivedRemainingTime / 45 * 100))
-					setRemainingTime(String(receivedRemainingTime))
+				if(!!!isNowNull){				
+					const receivedRemainingTime = getRemainingTime(localUNIXTime)
+					if(receivedRemainingTime === -1){ //授業時間外の場合
+						setPercentage(0)
+						setRemainingTime("")
+					}else{
+						setPercentage(100 - Math.round(receivedRemainingTime / 45 * 100))
+						setRemainingTime(String(receivedRemainingTime))
+					}
 				}
 			}
 		})()
