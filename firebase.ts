@@ -5,6 +5,7 @@ import { GoogleAuthProvider } from "firebase/auth"
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
 import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore"
 import { whattimeIsIt } from "./functions"
+import { async } from "@firebase/util"
 
 let app
 if(getApps().length < 1){
@@ -153,4 +154,17 @@ const getLectureData = (target: string, uid: string, UNIXTime: number): Promise<
 	})
 }
 
-export { auth, provider, checkUserDataExists, registerUserInformation, getUserData, getLectureData }
+const getClassName = (uid: string): Promise<any> => {
+	return new Promise(async (resolve) => {
+		//UIDから所属クラスを特定
+		const studentDoc = await getDoc(doc(db, "students", uid))
+		const studentData = studentDoc.data()
+		const classId: string = studentData?.class
+
+		const classDoc = await getDoc(doc(db, "classes", classId))
+		const classData = classDoc.data()
+		if(classData) resolve(classData.screenName)
+	})
+}
+
+export { auth, provider, checkUserDataExists, registerUserInformation, getUserData, getLectureData, getClassName }

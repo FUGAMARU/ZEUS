@@ -28,7 +28,7 @@ import SignInWithGoogle from "../components/SignInWithGoogle"
 import Loading from "../components/Loading"
 
 //Libraries
-import { auth, checkUserDataExists, getUserData } from "../firebase"
+import { auth, checkUserDataExists, getUserData, getClassName } from "../firebase"
 import { onAuthStateChanged } from "firebase/auth"
 
 //Contexts
@@ -43,6 +43,8 @@ const Index: NextPage = () => {
 	const [isAuthenicated, setAuthenicated] = useState<null|boolean>(null) //ログインされているか否か True => 通常のZEUSポータル, False => ログイン・登録ページ, null => ローディング画面
 	const [userName, setUserName] = useState("") //ユーザー名
 	const [userIconSrc, setUserIconSrc] = useState("") //ユーザーアイコンの画像URL
+	const [className, setClassName] = useState("")
+	const [classID, setClassID] = useState("")
 
 	const switchRegistered = (sw: boolean) => {
 		setAuthenicated(sw)
@@ -61,6 +63,8 @@ const Index: NextPage = () => {
 						setUserName(res.name)
 						setUserIconSrc(res.iconSrc)
 						setUID(user.uid)
+						setClassName(await getClassName(user.uid))
+						setClassID(res.class)
 						setAuthenicated(true) //ローディング画面解除
 					}else{ //ログインされている状態だけどユーザー情報の登録は済んでいない
 						setAuthenicated(null) //ローディング画面を表示させて
@@ -102,8 +106,10 @@ const Index: NextPage = () => {
 							<UserInfo userName={userName} userIconSrc={userIconSrc} />
 						</Center>	
 					</SimpleGrid>
+
+					<Text className="ksb" textAlign="center" fontSize="0.8rem" mt={3}>{className} ({classID})</Text>
 	
-					<SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={5} my={10} mx={3}>
+					<SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={5} my={3} mx={3}>
 						<FunctionCard title="現在の授業" gradientStartHex="#dfec51" gradientEndHex="#73aa0a" childComponent={<CurrentClass UID={UID} />} />
 						<FunctionCard title="次の授業" gradientStartHex="#09e7d3" gradientEndHex="#008bb6" childComponent={<NextClass UID={UID} />} />
 						<FunctionCard title="FileDispenser" gradientStartHex="#ffd97b" gradientEndHex="#f6a742" childComponent={<FileDispenser />} />
