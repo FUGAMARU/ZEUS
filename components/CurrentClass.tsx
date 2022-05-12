@@ -72,14 +72,14 @@ const CurrentClass = (props: Props) => {
 							classroomLink: res.classroom,
 							zoomLink: res.zoom
 						})
-						setHourLabel(String(whattimeIsIt(localUNIXTime) + "時限目"))
+						setHourLabel(String(whattimeIsIt(localUNIXTime, "current") + "時限目"))
 						setNowNull(false)
 					}
 				}
 
 				if(!!!isNowNull){				
-					const receivedRemainingTime = getRemainingTime(localUNIXTime)
-					if(receivedRemainingTime === -1){ //授業時間外の場合
+					const receivedRemainingTime = getRemainingTime(localUNIXTime, "current")
+					if(receivedRemainingTime === null){ //授業時間外の場合
 						setPercentage(0)
 						setRemainingTime("")
 					}else{

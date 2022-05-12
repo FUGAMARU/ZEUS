@@ -6,20 +6,18 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
 import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore"
 import { whattimeIsIt } from "./functions"
 
-const firebaseConfig = {
-	apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-	authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-	databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
-	projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-	storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-	messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-	appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-	measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
-}
-
 let app
 if(getApps().length < 1){
-	app = initializeApp(firebaseConfig)
+	app = initializeApp({
+		apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+		authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+		databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
+		projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+		storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+		messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+		appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+		measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+	})
 }
 //const app = initializeApp(firebaseConfig)
 //const analytics = getAnalytics(app)
@@ -91,11 +89,9 @@ const getUserData = (uid: string): Promise<any> => {
 		const teachersDoc = await getDoc(doc(db, "teachers", uid))
 
 		if(studentsDoc.exists()){
-			const docData = studentsDoc.data()
-			resolve(docData)
+			resolve(studentsDoc.data())
 		}else if(teachersDoc.exists()){
-			const docData = teachersDoc.data()
-			resolve(docData)
+			resolve(teachersDoc.data())
 		}
 	})
 }
@@ -111,38 +107,49 @@ interface ObjectTypes {
 
 const getLectureData = (target: string, uid: string, UNIXTime: number): Promise<any> => { //return => object, ""(授業未開講時)
 	return new Promise(async (resolve) => {
-		const hour = whattimeIsIt(UNIXTime) //今が何時限目なのか
-		if(hour === 0){ //授業未開講時
-			resolve("")
-		}else{
-			if(target === "current"){
-				//UIDから所属クラスを特定
-				const studentDoc = await getDoc(doc(db, "students", uid))
-				const studentData = studentDoc.data()
-				const classId: string = studentData?.class
-		
-				//クラスIDと現在の時間から授業IDを特定
-				const dayOfWeekStr = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"][new Date(UNIXTime * 1000).getDay()]
-				const classDoc = await getDoc(doc(db, "classes", classId))
-				const classData = classDoc.data()
+		const hour = whattimeIsIt(UNIXTime, target) //今が何時限目なのか
+		//UIDから所属クラスを特定
+		const studentDoc = await getDoc(doc(db, "students", uid))
+		const studentData = studentDoc.data()
+		const classId: string = studentData?.class
+
+		//クラスIDと現在の時間から授業IDを特定
+		const dayOfWeekStr = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"][new Date(UNIXTime * 1000).getDay()]
+		const classDoc = await getDoc(doc(db, "classes", classId))
+		const classData = classDoc.data()
+
+		if(target === "current"){
+			if(hour !== -1 && hour !== 0){
 				if(classData){
 					const lectureID: string|null = classData["lectures"][dayOfWeekStr][hour - 1]
-					//授業IDから授業情報を取得
 					if(lectureID === null){
 						resolve("")
 					}else{
+						//授業IDから授業情報を取得
 						const lectureDoc = await getDoc(doc(db, "lectures", lectureID))
 						resolve(lectureDoc.data())
 					}
 				}
-			}else if(target === "next"){
-				if(hour === 8){ //8時間目の次はない
-					resolve("")
-				}else{
-					//...
+			}else{
+				resolve("")
+			}
+		}else if(target === "next"){
+			if(hour !== -1 && hour !== 8){ //8時間目の次はない
+				if(classData){
+					const lectureID: string|null = classData["lectures"][dayOfWeekStr][hour]
+					if(lectureID === null){
+						resolve("")
+					}else{
+						//授業IDから授業情報を取得
+						const lectureDoc = await getDoc(doc(db, "lectures", lectureID))
+						resolve(lectureDoc.data())
+					}
 				}
+			}else{
+				resolve("")
 			}
 		}
+		
 	})
 }
 
