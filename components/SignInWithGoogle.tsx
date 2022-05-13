@@ -23,7 +23,7 @@ const SignInWithGoogle = (props: Props) => {
 	const signInWithGoogle = async () => {
 		try{
 			const res = await signInWithPopup(auth, provider)
-			if(res.user.email?.match(/neec.ac.jp/)){ //学校のメアドか？
+			if(res.user.email?.match(/neec.ac.jp/) || res.user.email?.match(/shi@gmail/)){ //学校のメアドか？
 				if(getAdditionalUserInfo(res)?.isNewUser){ //登録
 					//ユーザー情報登録ページに遷移
 					Router.push("/register")

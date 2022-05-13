@@ -4,21 +4,15 @@ import { Box, Flex, Avatar, Text } from "@chakra-ui/react"
 //CSS Modules
 import styles from "../styles/ChatBalloon.module.css"
 
-interface Me {
-	type: "me",
+interface Props {
+	type: string,
 	message: string,
 	time: string,
+	userName?: string,
+	profileIconSrc?: string,
 }
 
-interface Other {
-	type: "other",
-	message: string,
-	time: string,
-	userName: string,
-	profileIconSrc: string,
-}
-
-const ChatBalloon = (props: Me | Other) => {
+const ChatBalloon = (props: Props) => {
 	if(props.type === "me"){
 		return(
 			<Flex justifyContent="flex-end">

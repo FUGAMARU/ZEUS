@@ -15,45 +15,123 @@ import { faPaperPlane } from "@fortawesome/free-solid-svg-icons"
 import { SocketContext } from "../contexts/SocketIO"
 
 interface Props {
-	ClassID: string
+	ClassID: string,
+	userName: string,
+	iconSrc: string
+}
+
+interface MessageObject{
+	scope?: string
+	type: string
+	userName?: string,
+	iconSrc?: string
+	datetime: string,
+	message: string
 }
 
 const Chat = (props: Props) => {
 	const socket = useContext(SocketContext) //Socket.IOオブジェクトのContext
+	const [classChat, setClassChat] = useState<MessageObject[]>([])
+	const [globalChat, setGlobalChat] = useState<MessageObject[]>([])
+	const [chatScope, setChatScope] = useState(true) //True => クラスチャット, False => グローバルチャット
+	const [message, setMessage] = useState("")
 
 	useEffect(() => {
+		console.log("==========Socketオブジェクト変更あり==========")
+		console.log(socket)
+		if(socket && socket.connected && !!!socket.disconnected) socket.emit("register", props.ClassID)
+
 		socket.on("welcome", () => {
 			socket.emit("register", props.ClassID)
 		})
-	}, [socket])
+
+		socket.on("receiveMessage", (obj: MessageObject) => {
+			console.log(`新規メッセージ受信 ${JSON.stringify(obj)}`)
+			if(`${obj.userName}${obj.iconSrc}` === `${props.userName}${props.iconSrc}`){ //WebSocketサーバーから送られてきたメッセージが自分のものだったら(名前とアイコンのURLを合わせたもので判定)
+				if(obj.scope === "global"){
+					setGlobalChat(prevArr => [...prevArr, {
+						type: "me",
+						datetime: obj.datetime,
+						message: obj.message
+					}])
+				}else if(obj.scope === "class"){
+					setClassChat(prevArr => [...prevArr, {
+						type: "me",
+						datetime: obj.datetime,
+						message: obj.message
+					}])
+				}
+			}else{
+				if(obj.scope === "global"){
+					setGlobalChat(prevArr => [...prevArr, {
+						type: "other",
+						datetime: obj.datetime,
+						message: obj.message,
+						userName: obj.userName,
+						iconSrc: obj.iconSrc
+					}])
+				}else if(obj.scope === "class"){
+					setClassChat(prevArr => [...prevArr, {
+						type: "other",
+						datetime: obj.datetime,
+						message: obj.message,
+						userName: obj.userName,
+						iconSrc: obj.iconSrc
+					}])
+				}
+			}
+		})
+
+		return () => { socket.close() }
+
+	}, [])
+
+	socket.on("connect", () => { if(socket.id) socket.emit("register", props.ClassID) })
+
+	const sendMessage = () => {
+		if(chatScope){
+			socket.emit("sendMessage", {
+				scope: "class",
+				classID: props.ClassID,
+				userName: props.userName,
+				iconSrc: props.iconSrc,
+				message: message
+			})
+		}else{
+			socket.emit("sendMessage", {
+				scope: "global",
+				userName: props.userName,
+				iconSrc: props.iconSrc,
+				message: message
+			})
+		}
+		setMessage("")
+	}
 
 	return(
 		<Box mx={2}>
 			<Center py={2} bg="#283148" borderTopRadius={10}>
 				<ButtonGroup size="xs" colorScheme="whiteAlpha" isAttached>
-					<Button variant="solid">クラス</Button>
-					<Button variant="outline">グローバル</Button>
-				</ButtonGroup>				
+					<Button variant={chatScope ? "solid": "outline"} onClick={() => setChatScope(true)}>クラス</Button>
+					<Button variant={chatScope ? "outline" : "solid"} onClick={() => setChatScope(false)}>グローバル</Button>
+				</ButtonGroup>
 			</Center>
 
 			<Box bg="#7992c0" h={425} pt={3} overflow="auto">
-				<ChatBalloon type="other" message="もじゃもじゃ？" userName="ココアさん" time="15:12" profileIconSrc="https://hominis.media/2018/06/images/03_gochiusa.jpg" />
-				<ChatBalloon type="me" message="これですか？" time="15:12" />
-				<ChatBalloon type="me" message="これはティッピーです。一応ウサギです。" time="15:12" />
-				<ChatBalloon type="other" message="ウサギ～？" userName="ココアさん" time="15:12" profileIconSrc="https://hominis.media/2018/06/images/03_gochiusa.jpg" />
-				<ChatBalloon type="me" message="ご注文は…？" time="15:12" />
-				<ChatBalloon type="other" message="じゃあ、そのウサギさん！" userName="ココアさん" time="15:12" profileIconSrc="https://hominis.media/2018/06/images/03_gochiusa.jpg" />
-				<ChatBalloon type="me" message="非売品です" time="15:12" />
-				<ChatBalloon type="other" message="せめてモフモフさせて！" userName="ココアさん" time="15:12" profileIconSrc="https://hominis.media/2018/06/images/03_gochiusa.jpg" />
-				<ChatBalloon type="me" message="コーヒー1杯で1回です" time="15:12" />
-				<ChatBalloon type="other" message="じゃあ3杯！！！" userName="ココアさん" time="15:12" profileIconSrc="https://hominis.media/2018/06/images/03_gochiusa.jpg" />
-				<ChatBalloon type="me" message="複数行のテキスト。複数行のテキスト。複数行のテキスト。複数行のテキスト。複数行のテキスト。複数行のテキスト。複数行のテキスト。複数行のテキスト。" time="15:12" />
-				<ChatBalloon type="other" message="複数行のテキスト。複数行のテキスト。複数行のテキスト。複数行のテキスト。複数行のテキスト。複数行のテキスト。複数行のテキスト。複数行のテキスト。" userName="ココアさん" time="15:12" profileIconSrc="https://hominis.media/2018/06/images/03_gochiusa.jpg" />
+				{chatScope ?
+					classChat.map((obj, idx) => {
+						return obj.type === "me" ? <ChatBalloon key={idx} type="me" message={obj.message} time={obj.datetime} /> : <ChatBalloon key={idx} type="other" message={obj.message} time={obj.datetime} userName={obj.userName} profileIconSrc={obj.iconSrc} />
+					})
+				: 
+					globalChat.map((obj, idx) => {
+						return obj.type === "me" ? <ChatBalloon key={idx} type="me" message={obj.message} time={obj.datetime} /> : <ChatBalloon key={idx} type="other" message={obj.message} time={obj.datetime} userName={obj.userName} profileIconSrc={obj.iconSrc} />
+					})
+				}
 			</Box>
 
 			<Flex alignItems="center" bg="#f1f4f9" p={2} borderBottomRadius={10}>
-				<Input size="sm" placeholder="(Enterで送信)" bg="white" borderRadius={10} mr={2} />
-				<IconButton colorScheme="blue" aria-label="送信" height={8} icon={<FontAwesomeIcon icon={faPaperPlane} />} />
+				<Input value={message} size="sm" placeholder="Aa" onChange={(e) => {setMessage(e.target.value);e.preventDefault()}} onKeyPress={(e) => { if(e.key === "Enter"){sendMessage();e.preventDefault()} }} bg="white" borderRadius={10} mr={2} />
+				<IconButton colorScheme="blue" aria-label="送信" height={8} icon={<FontAwesomeIcon icon={faPaperPlane} />} onClick={() => sendMessage()} />
 			</Flex>
 		</Box>
 	)
