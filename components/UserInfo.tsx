@@ -1,5 +1,5 @@
 //React Hooks
-import { useRef, useState } from "react"
+import { useRef, useState, useContext, useEffect } from "react"
 
 //Chakra UI Components
 import { Flex, Avatar, Center, Popover, PopoverTrigger, Box, PopoverContent, PopoverHeader, PopoverArrow, PopoverCloseButton, Text } from "@chakra-ui/react"
@@ -12,6 +12,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faUserPen, faRightFromBracket } from "@fortawesome/free-solid-svg-icons"
 import { auth } from "../firebase"
 
+//Contexts
+import { SocketContext } from "../contexts/SocketIO"
+
 interface Props {
 	userName: string,
 	userIconSrc: string
@@ -22,6 +25,18 @@ const UserInfo = (props: Props) => {
 	const popoverRef = useRef(null)
 	const [editProfileTextColor, setEditProfileTextColor] = useState("#4a4848")
 	const [signOutTextColor, setSignOutTextColor] = useState("#4a4848")
+	const [WSStatusMessage, setWSStatusMessage] = useState("NG")
+	const socket = useContext(SocketContext) //Socket.IOオブジェクトのContext
+
+	useEffect(() => {
+		console.log("==========Socketオブジェクト変更あり==========")
+		console.log(socket)
+		if(socket && socket.connected && !!!socket.disconnected) setWSStatusMessage("OK")
+		if(socket && socket.disconnected && !!!socket.connected) setWSStatusMessage("NG")
+	}, [socket])
+
+	socket.on("connect", () => { if(socket.id) setWSStatusMessage("OK") })
+	socket.on("disconnect", () => { if(!!!socket.id) setWSStatusMessage("NG") })
 
 	const changeTextColor = (elm: string, sw: boolean) => {
 		switch(elm){
@@ -63,6 +78,7 @@ const UserInfo = (props: Props) => {
 				</PopoverTrigger>
 				<PopoverContent borderRadius={15}>
 					<PopoverArrow />
+					<PopoverCloseButton />
 					<PopoverHeader>
 						<Flex justifyContent="space-between" px={4}>
 							<Flex direction="column" alignItems="center" p={2} borderRadius={10} cursor="pointer" transition="0.3s all ease-out" _hover={{bg: "#10c9c3"}} onMouseEnter={() => changeTextColor("editProfile", true)} onMouseLeave={() => changeTextColor("editProfile", false)}>
@@ -78,6 +94,7 @@ const UserInfo = (props: Props) => {
 								<Text className="kr" fontSize="0.8rem" color={signOutTextColor} transition="0.3s all ease-out">サインアウト</Text>
 							</Flex>
 						</Flex>
+						<Text className="ksb" fontSize="0.7rem" textAlign="center" mt={2}>WebSocket接続ステータス: {WSStatusMessage}</Text>
 					</PopoverHeader>
 				</PopoverContent>
 			</>

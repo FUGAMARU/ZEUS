@@ -1,14 +1,22 @@
+//React Hooks
+import { useState, useEffect, useContext } from "react"
+
 //Chakra UI Components
-import { Box, Flex, Button, ButtonGroup, Center, Input, IconButton } from '@chakra-ui/react'
+import { Box, Flex, Button, ButtonGroup, Center, Input, IconButton } from "@chakra-ui/react"
 
 //Custom Components
-import ChatBalloon from './ChatBalloon'
+import ChatBalloon from "./ChatBalloon"
 
 //Libraries
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPaperPlane } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faPaperPlane } from "@fortawesome/free-solid-svg-icons"
+
+//Contexts
+import { SocketContext } from "../contexts/SocketIO"
 
 const Chat = () => {
+	const socket = useContext(SocketContext) //Socket.IOオブジェクトのContext	
+
 	return(
 		<Box mx={2}>
 			<Center py={2} bg="#283148" borderTopRadius={10}>

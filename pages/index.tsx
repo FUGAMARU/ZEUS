@@ -82,13 +82,6 @@ const Index: NextPage = () => {
 		})
 	}, [])
 
-	useEffect(() => {
-		socket.on("connection", (res: string) => {
-			console.log("WebSocket接続完了！")
-			console.log(res)
-		})
-	}, [socket])
-
 	if(isAuthenicated){ //通常のZEUSポータルを表示
 		return (
 			<Box className="animate__animated animate__fadeIn" minHeight="100vh" bg="#f0f0f0" position="relative">
@@ -122,6 +115,7 @@ const Index: NextPage = () => {
 					<Center bg="gray.300">フッター</Center>
 					<Text display="inline-block">{`Responsive: ${responsiveType}`}</Text>&nbsp;&nbsp;&nbsp;<Text display="inline-block">{`Touchable: ${isTouchDevice ? "Yes" : "No"}`}</Text><br />
 					<Button size="xs" colorScheme="pink">Use Timemachine</Button>
+					<Button size="xs" colorScheme="blue" onClick={() => { socket.emit("msg", "メッセージ") }}>Send via WS</Button>
 				</Container>
 				
 				<Box position="absolute" bottom={{base: 5, md: 19, lg: 30}} right={{base: 5, md: 19, lg: 30}} height={{base: 120, md: 160, lg: 200}} width={{base: 86, md: 114, lg: 143}} style={{transform: "rotate(15deg)"}}>

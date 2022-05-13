@@ -5,7 +5,6 @@ import { GoogleAuthProvider } from "firebase/auth"
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
 import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore"
 import { whattimeIsIt } from "./functions"
-import { async } from "@firebase/util"
 
 let app
 if(getApps().length < 1){
