@@ -14,8 +14,18 @@ import { faPaperPlane } from "@fortawesome/free-solid-svg-icons"
 //Contexts
 import { SocketContext } from "../contexts/SocketIO"
 
-const Chat = () => {
-	const socket = useContext(SocketContext) //Socket.IOオブジェクトのContext	
+interface Props {
+	ClassID: string
+}
+
+const Chat = (props: Props) => {
+	const socket = useContext(SocketContext) //Socket.IOオブジェクトのContext
+
+	useEffect(() => {
+		socket.on("welcome", () => {
+			socket.emit("register", props.ClassID)
+		})
+	}, [socket])
 
 	return(
 		<Box mx={2}>
