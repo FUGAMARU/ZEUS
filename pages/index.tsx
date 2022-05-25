@@ -1,5 +1,5 @@
 //React Hooks
-import { useEffect, useState, useContext } from "react"
+import { useEffect, useState } from "react"
 
 //Custom Hooks
 import { useResponsive } from "../hooks/useResponsive"
@@ -31,20 +31,16 @@ import Loading from "../components/Loading"
 import { auth, checkUserDataExists, getUserData, getClassName } from "../firebase"
 import { onAuthStateChanged } from "firebase/auth"
 
-//Contexts
-import { SocketContext } from "../contexts/SocketIO"
-
 const Index: NextPage = () => {
 	const responsiveType = useResponsive() //リアクティブな画面幅タイプの変数
 	const isTouchDevice = useTouchDevice() //タッチ可能かどうか
 	const { localUNIXTime } = useUNIXTime()
 	const [UID, setUID] = useState("") //ログイン中ユーザーのUID
-	const socket = useContext(SocketContext) //Socket.IOオブジェクトのContext
 	const [isAuthenicated, setAuthenicated] = useState<null|boolean>(null) //ログインされているか否か True => 通常のZEUSポータル, False => ログイン・登録ページ, null => ローディング画面
 	const [userName, setUserName] = useState("") //ユーザー名
 	const [userIconSrc, setUserIconSrc] = useState("") //ユーザーアイコンの画像URL
-	const [className, setClassName] = useState("")
-	const [classID, setClassID] = useState("")
+	const [className, setClassName] = useState("") //所属クラスの表示名
+	const [classID, setClassID] = useState("") //所属クラスID
 
 	const switchRegistered = (sw: boolean) => {
 		setAuthenicated(sw)
@@ -76,7 +72,7 @@ const Index: NextPage = () => {
 				console.log("ログインされていません")
 			}
 		})
-
+		
 		return (() => {
 			unsubscribe()
 		})
@@ -115,7 +111,6 @@ const Index: NextPage = () => {
 					<Center bg="gray.300">フッター</Center>
 					<Text display="inline-block">{`Responsive: ${responsiveType}`}</Text>&nbsp;&nbsp;&nbsp;<Text display="inline-block">{`Touchable: ${isTouchDevice ? "Yes" : "No"}`}</Text><br />
 					<Button size="xs" colorScheme="pink">Use Timemachine</Button>
-					<Button size="xs" colorScheme="blue" onClick={() => { socket.emit("msg", "メッセージ") }}>Send via WS</Button>
 				</Container>
 				
 				<Box position="absolute" bottom={{base: 5, md: 19, lg: 30}} right={{base: 5, md: 19, lg: 30}} height={{base: 120, md: 160, lg: 200}} width={{base: 86, md: 114, lg: 143}} style={{transform: "rotate(15deg)"}}>

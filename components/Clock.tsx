@@ -1,5 +1,5 @@
 //React Hooks
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useContext } from "react"
 
 //Custom Hooks
 import { useResponsive } from "../hooks/useResponsive"
@@ -8,6 +8,9 @@ import useMuroranWeather from "../hooks/useMuroranWeather"
 
 //Chakra UI Components
 import { Box, Flex, Center, Text, Popover, PopoverTrigger, PopoverContent, PopoverHeader, PopoverBody, PopoverArrow, PopoverCloseButton, VStack, StackDivider } from '@chakra-ui/react'
+
+//Contexts
+import { SocketContext } from "../contexts/SocketIO"
 
 interface Props {
 	UNIXTime: number
@@ -33,6 +36,8 @@ const Clock = (props: Props) => {
 	const [weatherIconUrl, setWeatherIconUrl] = useState("")
 	const [weatherTelop, setWeatherTelop] = useState("")
 	const [temp, setTemp] = useState("")
+	const socket = useContext(SocketContext)
+	const [twitterTrends, setTwitterTrends] = useState<{name: string, url: string}[]>([])
 
 	useEffect(() => {
 		//LocalStorageから天気予報の地点を読み込んでstateに反映
@@ -42,6 +47,16 @@ const Clock = (props: Props) => {
 		}else{
 			setWeatherLocationFlag(false)
 		}
+
+		socket.emit("requestTrends")
+		socket.on("receiveTrends", (data: {name: string, url: string}[]) => {
+			console.log(data)
+			setTwitterTrends(data)
+		})
+
+		return (() => {
+			socket.close()
+		})
 	}, [])
 
 	useEffect(() => {
@@ -134,9 +149,9 @@ const Clock = (props: Props) => {
 					<PopoverBody pl={0}>
 						<Box className="kb" fontSize="1.1rem" color="white" display="inline-block" px={5} mb={2} bg="linear-gradient(90deg, rgba(32,156,255,1) 0%, rgba(104,224,207,1) 100%)">#トレンド</Box>
 						<VStack align="stretch" divider={<StackDivider borderColor="gray.200"/>}>
-							<a href="https://twitter.com/search?q=%23ZETAWIN&src=trend_click&vertical=trends" target="_blank" rel="noopener noreferrer"><Text className="ksb" pl={4}>1. #ZETAWIN</Text></a>
-							<a href="https://twitter.com/search?q=%E3%82%B7%E3%83%A3%E3%83%B3%E3%82%AF%E3%82%B9%E3%81%AE%E5%A8%98&src=trend_click&pt=1514000519198801922&vertical=trends" target="_blank" rel="noopener noreferrer"><Text className="ksb" pl={4}>2. シャンクスの娘</Text></a>
-							<a href="https://twitter.com/search?q=Laz%E3%81%95%E3%82%93&src=trend_click&vertical=trends" target="_blank" rel="noopener noreferrer"><Text className="ksb" pl={4}>3. #Lazさん</Text></a>
+							{twitterTrends.map((obj, idx) => {
+								return <a key={idx} href={obj.url} target="_blank" rel="noopener noreferrer"><Text className="ksb" pl={4}>{idx + 1}. #{obj.name}</Text></a>
+							})}
 						</VStack>
 					</PopoverBody>
 				</PopoverContent>
