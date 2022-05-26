@@ -16,6 +16,15 @@ interface Props {
 	UNIXTime: number
 }
 
+interface TwitterTrends {
+	trends: {
+		name: string,
+		url: string,
+		tweet_volume: number
+	}[],
+	lastUpdate: string
+}
+
 const Clock = (props: Props) => {
 	const responsiveType = useResponsive() //リアクティブな画面幅タイプの変数
 	const dayOfWeek = ["日", "月", "火", "水", "木", "金", "土"] //曜日番号から文字へ変換する用の配列
@@ -37,7 +46,7 @@ const Clock = (props: Props) => {
 	const [weatherTelop, setWeatherTelop] = useState("")
 	const [temp, setTemp] = useState("")
 	const socket = useContext(SocketContext)
-	const [twitterTrends, setTwitterTrends] = useState<{name: string, url: string}[]>([])
+	const [twitterTrends, setTwitterTrends] = useState<TwitterTrends>({trends: [{name: "Trend1", url: "https://twitter.com", tweet_volume: 0}, {name: "Trend2", url: "https://twitter.com", tweet_volume: 0}, {name: "Trend3", url: "https://twitter.com", tweet_volume: 0}], lastUpdate: ""})
 
 	useEffect(() => {
 		//LocalStorageから天気予報の地点を読み込んでstateに反映
@@ -49,7 +58,7 @@ const Clock = (props: Props) => {
 		}
 
 		socket.emit("requestTrends")
-		socket.on("receiveTrends", (data: {name: string, url: string}[]) => {
+		socket.on("receiveTrends", (data: TwitterTrends) => {
 			console.log(data)
 			setTwitterTrends(data)
 		})
@@ -147,10 +156,20 @@ const Clock = (props: Props) => {
 						}
 					</PopoverHeader>
 					<PopoverBody pl={0}>
-						<Box className="kb" fontSize="1.1rem" color="white" display="inline-block" px={5} mb={2} bg="linear-gradient(90deg, rgba(32,156,255,1) 0%, rgba(104,224,207,1) 100%)">#トレンド</Box>
+						<Flex mb={2} justifyContent="space-between" alignItems="flex-end">
+							<Box className="kb" fontSize="1.1rem" color="white" display="inline-block" px={5} bg="linear-gradient(90deg, rgba(32,156,255,1) 0%, rgba(104,224,207,1) 100%)">#トレンド</Box>
+							<Text className="kr" fontSize={{base: "0.6rem", md: "0.6rem", lg: "0.5rem"}} textDecoration="underline" color="#808080">最終更新 {twitterTrends?.lastUpdate}</Text>
+						</Flex>
 						<VStack align="stretch" divider={<StackDivider borderColor="gray.200"/>}>
-							{twitterTrends.map((obj, idx) => {
-								return <a key={idx} href={obj.url} target="_blank" rel="noopener noreferrer"><Text className="ksb" pl={4}>{idx + 1}. #{obj.name}</Text></a>
+							{twitterTrends.trends.map((obj, idx) => {
+								return (
+									<Flex key={idx} alignItems="flex-end">
+										<a href={obj.url} target="_blank" rel="noopener noreferrer">
+											<Text className="ksb" pl={4}>{idx + 1}. #{obj.name.replace(/#/, "")}</Text>
+										</a>
+										<Text className="kr" fontSize={{base: "0.6rem", md: "0.6rem", lg: "0.5rem"}} ml={2} mb="0.15rem" fontStyle="italic" textDecoration="underline" color="#808080">{obj.tweet_volume}ツイート</Text>
+									</Flex>
+								)
 							})}
 						</VStack>
 					</PopoverBody>
