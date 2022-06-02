@@ -81,9 +81,6 @@ const Chat = (props: Props) => {
 				}
 			}
 		})
-
-		return () => { socket.close() }
-
 	}, [])
 
 	socket.on("connect", () => { if(socket.id) socket.emit("register", props.ClassID) })

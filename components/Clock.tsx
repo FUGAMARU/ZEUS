@@ -1,5 +1,5 @@
 //React Hooks
-import { useState, useEffect, useRef, useContext } from "react"
+import { useState, useEffect, useRef } from "react"
 
 //Custom Hooks
 import { useResponsive } from "../hooks/useResponsive"
@@ -9,8 +9,9 @@ import useMuroranWeather from "../hooks/useMuroranWeather"
 //Chakra UI Components
 import { Box, Flex, Center, Text, Popover, PopoverTrigger, PopoverContent, PopoverHeader, PopoverBody, PopoverArrow, PopoverCloseButton, VStack, StackDivider } from '@chakra-ui/react'
 
-//Contexts
-import { SocketContext } from "../contexts/SocketIO"
+//Libraries
+import useSWR from "swr"
+const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 interface Props {
 	UNIXTime: number
@@ -45,8 +46,20 @@ const Clock = (props: Props) => {
 	const [weatherIconUrl, setWeatherIconUrl] = useState("")
 	const [weatherTelop, setWeatherTelop] = useState("")
 	const [temp, setTemp] = useState("")
-	const socket = useContext(SocketContext)
 	const [twitterTrends, setTwitterTrends] = useState<TwitterTrends>({trends: [{name: "Trend1", url: "https://twitter.com", tweet_volume: 0}, {name: "Trend2", url: "https://twitter.com", tweet_volume: 0}, {name: "Trend3", url: "https://twitter.com", tweet_volume: 0}], lastUpdate: ""})
+
+	const { data: swrTwitterTrendsData, error: swrTwitterTrendsError } = useSWR(process.env.NEXT_PUBLIC_TWITTER_TRENDS_ADDRESS, fetcher, { refreshInterval: 60000 })
+
+	useEffect(() => {
+		if(swrTwitterTrendsData){
+			console.log("Twitterトレンドを取得しました")
+			console.log(swrTwitterTrendsData)
+			setTwitterTrends(swrTwitterTrendsData)
+		}
+		if(swrTwitterTrendsError){
+			console.log("Twitterトレンド取得エラー")
+		}
+	}, [swrTwitterTrendsData, swrTwitterTrendsError])
 
 	useEffect(() => {
 		//LocalStorageから天気予報の地点を読み込んでstateに反映
@@ -55,17 +68,7 @@ const Clock = (props: Props) => {
 			setWeatherLocationFlag(true)
 		}else{
 			setWeatherLocationFlag(false)
-		}
-
-		socket.emit("requestTrends")
-		socket.on("receiveTrends", (data: TwitterTrends) => {
-			console.log(data)
-			setTwitterTrends(data)
-		})
-
-		return (() => {
-			socket.close()
-		})
+		}		
 	}, [])
 
 	useEffect(() => {
