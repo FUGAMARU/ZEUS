@@ -37,8 +37,6 @@ const Chat = (props: Props) => {
 	const [message, setMessage] = useState("")
 
 	useEffect(() => {
-		console.log("==========Socketオブジェクト変更あり==========")
-		console.log(socket)
 		if(socket && socket.connected && !!!socket.disconnected) socket.emit("register", props.ClassID)
 
 		socket.on("welcome", () => {
@@ -81,6 +79,8 @@ const Chat = (props: Props) => {
 				}
 			}
 		})
+
+		return () => { socket.close() }
 	}, [])
 
 	socket.on("connect", () => { if(socket.id) socket.emit("register", props.ClassID) })

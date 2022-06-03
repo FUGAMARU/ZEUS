@@ -33,6 +33,8 @@ const UserInfo = (props: Props) => {
 		console.log(socket)
 		if(socket && socket.connected && !!!socket.disconnected) setWSStatusMessage("OK")
 		if(socket && socket.disconnected && !!!socket.connected) setWSStatusMessage("NG")
+
+		return () => { socket.close() }
 	}, [socket])
 
 	socket.on("connect", () => { if(socket.id) setWSStatusMessage("OK") })
