@@ -3,14 +3,13 @@ import { useState, useEffect, useRef } from "react"
 
 //Custom Hooks
 import { useResponsive } from "../hooks/useResponsive"
-import useTokyoWeather from "../hooks/useTokyoWeather"
-import useMuroranWeather from "../hooks/useMuroranWeather"
 
 //Chakra UI Components
 import { Box, Flex, Center, Text, Popover, PopoverTrigger, PopoverContent, PopoverHeader, PopoverBody, PopoverArrow, PopoverCloseButton, VStack, StackDivider } from '@chakra-ui/react'
 
 //Libraries
 import useSWR from "swr"
+import useSWRImmutable from "swr/immutable"
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 interface Props {
@@ -40,8 +39,6 @@ const Clock = (props: Props) => {
 	})
 	const popoverRef = useRef(null)
 	const [weatherLocationFlag, setWeatherLocationFlag] = useState(true) //天気予報の地点切り替え用変数(True => 東京, False => 室蘭)
-	const { tokyoWeather, isTokyoWeatherLoading, isTokyoWeatherError } = useTokyoWeather()
-	const { muroranWeather, isMuroranWeatherLoading, isMuroranWeatherError } = useMuroranWeather()
 	const [weatherClassNames, setWeatherClassNames] = useState("")
 	const [weatherIconUrl, setWeatherIconUrl] = useState("")
 	const [weatherTelop, setWeatherTelop] = useState("")
@@ -49,6 +46,8 @@ const Clock = (props: Props) => {
 	const [twitterTrends, setTwitterTrends] = useState<TwitterTrends>({trends: [{name: "Trend1", url: "https://twitter.com", tweet_volume: 0}, {name: "Trend2", url: "https://twitter.com", tweet_volume: 0}, {name: "Trend3", url: "https://twitter.com", tweet_volume: 0}], lastUpdate: ""})
 
 	const { data: swrTwitterTrendsData, error: swrTwitterTrendsError } = useSWR(process.env.NEXT_PUBLIC_TWITTER_TRENDS_ADDRESS, fetcher, { refreshInterval: 60000 })
+	const { data: tokyoWeather, error: tokyoWeatherError } = useSWRImmutable("https://weather.tsukumijima.net/api/forecast/city/130010", fetcher)
+	const { data: muroranWeather, error: muroranWeatherError } = useSWRImmutable("https://weather.tsukumijima.net/api/forecast/city/015010", fetcher)
 
 	useEffect(() => {
 		if(swrTwitterTrendsData){
@@ -150,13 +149,13 @@ const Clock = (props: Props) => {
 							<Text className="kr" borderLeftRadius={20} fontSize={{base: "0.8rem", md: "0.7rem", lg: "0.7rem"}} px={2} bg={weatherLocationFlag ? "black" : "white"} color={weatherLocationFlag ? "white" : "black"} cursor={weatherLocationFlag ? "default" : "pointer"} _hover={weatherLocationFlag ? {bg: "black"} : {bg: "#f0f0f0"}} onClick={() => setWeatherLocationFlag(!weatherLocationFlag)}>東京</Text>
 							<Text className="kr" borderRightRadius={20} fontSize={{base: "0.8rem", md: "0.7rem", lg: "0.7rem"}} px={2} bg={weatherLocationFlag ? "white" : "black"} color={weatherLocationFlag ? "black" : "white"} cursor={weatherLocationFlag ? "pointer" : "default"} _hover={weatherLocationFlag ? {bg: "#f0f0f0"} : {bg: "black"}} onClick={() => setWeatherLocationFlag(!weatherLocationFlag)}>室蘭</Text>
 						</Center>
-						{isTokyoWeatherLoading || isMuroranWeatherLoading ? <Text className="kb">天気情報取得中</Text> : isTokyoWeatherError || isMuroranWeatherError ? <Text className="kb">天気情報取得エラー</Text> : 
+						{tokyoWeather || muroranWeather ?
 							<Flex className={weatherClassNames} alignItems="center" justifyContent="center">
 								<img src={weatherIconUrl} style={{height: "2.3rem"}}></img>
 								<Text className="kb" ml={2} fontSize={{base: "1.3rem", md: "1.2rem", lg: "1.2rem"}}>{weatherTelop}</Text>
 								<Text className="ksb" color="red" ml={2} fontSize={{base: "1.1rem", md: "1rem", lg: "1rem"}}>{temp}℃</Text>
 							</Flex>
-						}
+						: tokyoWeatherError || muroranWeatherError ? <Text className="kb">天気情報取得エラー</Text> : <Text className="kb">天気情報取得中</Text>}
 					</PopoverHeader>
 					<PopoverBody pl={0}>
 						<Flex mb={2} justifyContent="space-between" alignItems="flex-end">
