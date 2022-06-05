@@ -27,6 +27,7 @@ interface TwitterTrends {
 
 const Clock = (props: Props) => {
 	const responsiveType = useResponsive() //リアクティブな画面幅タイプの変数
+	const popoverRef = useRef(null)
 	const dayOfWeek = ["日", "月", "火", "水", "木", "金", "土"] //曜日番号から文字へ変換する用の配列
 	const [datetime, setDatetime] = useState({
 		year: 2000, //西暦
@@ -37,12 +38,13 @@ const Clock = (props: Props) => {
 		minute: "0", //分
 		second: "0" //秒
 	})
-	const popoverRef = useRef(null)
 	const [weatherLocationFlag, setWeatherLocationFlag] = useState(true) //天気予報の地点切り替え用変数(True => 東京, False => 室蘭)
 	const [weatherClassNames, setWeatherClassNames] = useState("")
-	const [weatherIconUrl, setWeatherIconUrl] = useState("")
-	const [weatherTelop, setWeatherTelop] = useState("")
-	const [temp, setTemp] = useState("")
+	const [weather, setWeather] = useState({
+		iconUrl: "",
+		telop: "",
+		temp: ""
+	})
 	const [twitterTrends, setTwitterTrends] = useState<TwitterTrends>({trends: [{name: "Trend1", url: "https://twitter.com", tweet_volume: 0}, {name: "Trend2", url: "https://twitter.com", tweet_volume: 0}, {name: "Trend3", url: "https://twitter.com", tweet_volume: 0}], lastUpdate: ""})
 
 	const { data: swrTwitterTrendsData, error: swrTwitterTrendsError } = useSWR(process.env.NEXT_PUBLIC_TWITTER_TRENDS_ADDRESS, fetcher, { refreshInterval: 60000 })
@@ -89,9 +91,11 @@ const Clock = (props: Props) => {
 			console.log("天気情報取得完了(東京)")
 			console.log(tokyoWeather)
 			if(weatherLocationFlag){
-				setWeatherIconUrl(tokyoWeather.forecasts[0].image.url)
-				setWeatherTelop(tokyoWeather.forecasts[0].telop)
-				setTemp(tokyoWeather.forecasts[0].temperature.max.celsius)
+				setWeather({
+					iconUrl: tokyoWeather.forecasts[0].image.url,
+					telop: tokyoWeather.forecasts[0].telop,
+					temp: tokyoWeather.forecasts[0].temperature.max.celsius
+				})
 			}
 		}
 	}, [tokyoWeather])
@@ -101,9 +105,11 @@ const Clock = (props: Props) => {
 			console.log("天気情報取得完了(室蘭)")
 			console.log(muroranWeather)
 			if(!(weatherLocationFlag)){
-				setWeatherIconUrl(muroranWeather.forecasts[0].image.url)
-				setWeatherTelop(muroranWeather.forecasts[0].telop)
-				setTemp(muroranWeather.forecasts[0].temperature.max.celsius)
+				setWeather({
+					iconUrl: muroranWeather.forecasts[0].image.url,
+					telop: muroranWeather.forecasts[0].telop,
+					temp: muroranWeather.forecasts[0].temperature.max.celsius
+				})
 			}
 		}
 	}, [muroranWeather])	
@@ -114,14 +120,18 @@ const Clock = (props: Props) => {
 			setTimeout(() => {
 				if(weatherLocationFlag){
 					localStorage["weatherLocation"] = "tokyo"
-					setWeatherIconUrl(tokyoWeather.forecasts[0].image.url)
-					setWeatherTelop(tokyoWeather.forecasts[0].telop)
-					setTemp(tokyoWeather.forecasts[0].temperature.max.celsius)
+					setWeather({
+						iconUrl: tokyoWeather.forecasts[0].image.url,
+						telop: tokyoWeather.forecasts[0].telop,
+						temp: tokyoWeather.forecasts[0].temperature.max.celsius
+					})
 				}else{
 					localStorage["weatherLocation"] = "muroran"
-					setWeatherIconUrl(muroranWeather.forecasts[0].image.url)
-					setWeatherTelop(muroranWeather.forecasts[0].telop)
-					setTemp(muroranWeather.forecasts[0].temperature.max.celsius)
+					setWeather({
+						iconUrl: muroranWeather.forecasts[0].image.url,
+						telop: muroranWeather.forecasts[0].telop,
+						temp: muroranWeather.forecasts[0].temperature.max.celsius
+					})
 				}
 				setWeatherClassNames("animate__animated animate__flipInX animate__fast")
 			}, 800)
@@ -151,9 +161,9 @@ const Clock = (props: Props) => {
 						</Center>
 						{tokyoWeather || muroranWeather ?
 							<Flex className={weatherClassNames} alignItems="center" justifyContent="center">
-								<img src={weatherIconUrl} style={{height: "2.3rem"}}></img>
-								<Text className="kb" ml={2} fontSize={{base: "1.3rem", md: "1.2rem", lg: "1.2rem"}}>{weatherTelop}</Text>
-								<Text className="ksb" color="red" ml={2} fontSize={{base: "1.1rem", md: "1rem", lg: "1rem"}}>{temp}℃</Text>
+								<img src={weather.iconUrl} style={{height: "2.3rem"}}></img>
+								<Text className="kb" ml={2} fontSize={{base: "1.3rem", md: "1.2rem", lg: "1.2rem"}}>{weather.telop}</Text>
+								{weather.temp !== null ? <Text className="ksb" color="red" ml={2} fontSize={{base: "1.1rem", md: "1rem", lg: "1rem"}}>{weather.temp}℃</Text> : ""}
 							</Flex>
 						: tokyoWeatherError || muroranWeatherError ? <Text className="kb">天気情報取得エラー</Text> : <Text className="kb">天気情報取得中</Text>}
 					</PopoverHeader>
