@@ -41,40 +41,14 @@ const CurrentClass = (props: Props) => {
 	})
 	const [percentage, setPercentage] = useState(0)
 	const [remainingTime, setRemainingTime] = useState("0")
-	const [hourLabel, setHourLabel] = useState("取得中…")
+	const [hourLabel, setHourLabel] = useState("取得中…")	
 
 	useEffect(() => {
-		(async() => {
 			if(localUNIXTime !== 0){
 				const timings = [930, 1015, 1100, 1110, 1155, 1240, 1330, 1415, 1500, 1510, 1555, 1640]
 				if(!!!UNIXTimeFlag || timings.includes(getTimestamp(localUNIXTime))){ //コンポーネント読み込み時または授業開始・終了時間に処理を行う
 					setUNIXTimeFlag(true)
-					const res = await getLectureData("current", props.UID, localUNIXTime)
-					console.log("==========現在の授業情報==========")
-					console.log(res)
-					if(res === ""){
-						setLectureData({
-							name: "現在の授業はありません",
-							hours: "ㅤㅤㅤㅤㅤㅤㅤ",
-							location: "ㅤㅤㅤㅤㅤㅤㅤ",
-							teacher: "ㅤㅤㅤㅤㅤㅤㅤ",
-							classroomLink: "https://classroom.google.com/",
-							zoomLink: "https://zoom.us/"
-						})
-						setHourLabel("")
-						setNowNull(true)
-					}else{
-						setLectureData({
-							name: res.name,
-							hours: res.hours,
-							location: res.location,
-							teacher: res.teacher,
-							classroomLink: res.classroom,
-							zoomLink: res.zoom
-						})
-						setHourLabel(String(whattimeIsIt(localUNIXTime, "current") + "時限目"))
-						setNowNull(false)
-					}
+					getAndSetLectureData()
 				}
 
 				if(!!!isNowNull){				
@@ -88,8 +62,51 @@ const CurrentClass = (props: Props) => {
 					}
 				}
 			}
-		})()
+
+			if(!!!UNIXTimeFlag){
+				document.addEventListener("visibilitychange", () => {
+					if(document.visibilityState === "visible"){
+						setTimeout(() => {
+							console.log("タブが復帰しました")
+							getAndSetLectureData()
+						}, 1000) //useSWRが時刻データーを引っ張ってくるのにかかる時間を考慮して復帰1秒後にFirestoreにリクエストを送る
+					}
+				})
+			}
 	}, [localUNIXTime])
+
+	const getAndSetLectureData = async () => {
+		if(localUNIXTime !== 0){
+			const res = await getLectureData("current", props.UID, localUNIXTime)
+			console.log("==========現在の授業情報==========")
+			console.log(res)
+			if(res === ""){
+				setLectureData({
+					name: "現在の授業はありません",
+					hours: "ㅤㅤㅤㅤㅤㅤㅤ",
+					location: "ㅤㅤㅤㅤㅤㅤㅤ",
+					teacher: "ㅤㅤㅤㅤㅤㅤㅤ",
+					classroomLink: "https://classroom.google.com/",
+					zoomLink: "https://zoom.us/"
+				})
+				setHourLabel("")
+				setNowNull(true)
+			}else{
+				setLectureData({
+					name: res.name,
+					hours: res.hours,
+					location: res.location,
+					teacher: res.teacher,
+					classroomLink: res.classroom,
+					zoomLink: res.zoom
+				})
+				setHourLabel(String(whattimeIsIt(localUNIXTime, "current") + "時限目"))
+				setNowNull(false)
+			}
+		}else{
+			console.log("Local Unix Time is ZERO")
+		}
+	}
 
 	return(
 		<Box>

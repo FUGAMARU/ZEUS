@@ -43,50 +43,67 @@ const NextClass = (props: Props) => {
 	const [hourLabel, setHourLabel] = useState("取得中…")
 
 	useEffect(() => {
-		(async() => {
-			if(localUNIXTime !== 0){
-				const timings = [830, 930, 1015, 1110, 1155, 1330, 1415, 1510, 1555]
-				if(!!!UNIXTimeFlag || timings.includes(getTimestamp(localUNIXTime))){ //コンポーネント読み込み時または授業開始・終了時間に処理を行う
-					setUNIXTimeFlag(true)
-					const res = await getLectureData("next", props.UID, localUNIXTime)
-					console.log("==========次の授業情報==========")
-					console.log(res)
-					if(res === ""){
-						setLectureData({
-							name: "次の授業はありません",
-							hours: "ㅤㅤㅤㅤㅤㅤㅤ",
-							location: "ㅤㅤㅤㅤㅤㅤㅤ",
-							teacher: "ㅤㅤㅤㅤㅤㅤㅤ",
-							classroomLink: "https://classroom.google.com/"
-						})
-						setHourLabel("")
-						setNowNull(true)
-					}else{
-						setLectureData({
-							name: res.name,
-							hours: res.hours,
-							location: res.location,
-							teacher: res.teacher,
-							classroomLink: res.classroom
-						})
-						setHourLabel(String(whattimeIsIt(localUNIXTime, "next") + 1) + "時限目")
-						setNowNull(false)
-					}
-				}
+		if(localUNIXTime !== 0){
+			const timings = [830, 930, 1015, 1110, 1155, 1330, 1415, 1510, 1555]
+			if(!!!UNIXTimeFlag || timings.includes(getTimestamp(localUNIXTime))){ //コンポーネント読み込み時または授業開始・終了時間に処理を行う
+				setUNIXTimeFlag(true)
+				getAndSetLectureData()
+			}
 
-				if(!!!isNowNull){				
-					const receivedRemainingTime = getRemainingTime(localUNIXTime, "next")
-					if(receivedRemainingTime === null){ //授業時間外の場合
-						setPercentage(0)
-						setRemainingTime("")
-					}else{
-						setPercentage(Math.round(receivedRemainingTime / 45 * 100))
-						setRemainingTime(String(receivedRemainingTime))
-					}
+			if(!!!isNowNull){				
+				const receivedRemainingTime = getRemainingTime(localUNIXTime, "next")
+				if(receivedRemainingTime === null){ //授業時間外の場合
+					setPercentage(0)
+					setRemainingTime("")
+				}else{
+					setPercentage(Math.round(receivedRemainingTime / 45 * 100))
+					setRemainingTime(String(receivedRemainingTime))
 				}
 			}
-		})()
+		}
+
+		if(!!!UNIXTimeFlag){
+			document.addEventListener("visibilitychange", () => {
+				if(document.visibilityState === "visible"){
+					setTimeout(() => {
+						console.log("タブが復帰しました")
+						getAndSetLectureData()
+					}, 1000) //useSWRが時刻データーを引っ張ってくるのにかかる時間を考慮して復帰1秒後にFirestoreにリクエストを送る
+				}
+			})
+		}
 	}, [localUNIXTime])
+
+	const getAndSetLectureData = async () => {
+		if(localUNIXTime !== 0){
+			const res = await getLectureData("next", props.UID, localUNIXTime)
+			console.log("==========次の授業情報==========")
+			console.log(res)
+			if(res === ""){
+				setLectureData({
+					name: "次の授業はありません",
+					hours: "ㅤㅤㅤㅤㅤㅤㅤ",
+					location: "ㅤㅤㅤㅤㅤㅤㅤ",
+					teacher: "ㅤㅤㅤㅤㅤㅤㅤ",
+					classroomLink: "https://classroom.google.com/"
+				})
+				setHourLabel("")
+				setNowNull(true)
+			}else{
+				setLectureData({
+					name: res.name,
+					hours: res.hours,
+					location: res.location,
+					teacher: res.teacher,
+					classroomLink: res.classroom
+				})
+				setHourLabel(String(whattimeIsIt(localUNIXTime, "next") + 1) + "時限目")
+				setNowNull(false)
+			}
+		}else{
+			console.log("Local Unix Time is ZERO")
+		}
+	}
 
 	return(
 		<Box>
