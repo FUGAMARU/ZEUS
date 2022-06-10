@@ -49,10 +49,6 @@ interface UserData {
 }
 
 const registerUserInformation = (uid: string, accountType: string, userData: UserData, userIcon: any) => {
-	console.log("======================")
-	console.log(uid)
-	console.log(accountType)
-	console.log(userData)
 	const docRef = accountType === "student" ? doc(db, "students", uid) : doc(db, "teachers", uid)
 
 	return new Promise(async (resolve, reject) => {

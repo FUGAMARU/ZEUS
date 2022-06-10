@@ -6,35 +6,52 @@ import useSWR from "swr"
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 const useUNIXTime = () => {
-	const [localUNIXTime, setLocalUnixTime] = useState(0) //UNIXタイムスタンプ(1秒ごとに自動更新) 時刻取得中 => 0, 時刻取得エラー => -1
-	const [isClockStarted, setClockStarted] = useState(false) //UNIXタイムスタンプのカウントアップがスタートしているか
-
-	const { data, error } = useSWR("https://worldtimeapi.org/api/timezone/Asia/Tokyo", fetcher)
-
+	const [localUNIXTime, setLocalUNIXTime] = useState(0)
+	const [updateFlag, setUpdateFlag] = useState(true) //SWRが時刻取得完了したことをトリガーとして授業情報表示コンポーネントを再レンダリングするためのstate
+	const [isClockStarted, setClockStarted] = useState(false) //UNIXタイムスタンプのカウントアップがスタートしているかどうか
+	interface WorldTimeApi {
+		abbreviation: string,
+		client_ip: string,
+		datetime: string,
+		day_of_week: number,
+		day_of_year: number,
+		dst: boolean,
+		dst_from: any,
+		dst_offset: number,
+		dst_until: any,
+		raw_offset: number,
+		timezone: string,
+		unixtime: number,
+		utc_datetime: string,
+		utc_offset: string,
+		week_number: number
+	}
+	const { data: apiData, error: apiErr } = useSWR<WorldTimeApi>("https://worldtimeapi.org/api/timezone/Asia/Tokyo", fetcher)
+	
 	useEffect(() => {
-		if(data){
-			console.log("UNIXタイムスタンプ新規受信")
-			console.log(data.unixtime)
-			if(isClockStarted === false){
-				setLocalUnixTime(data.unixtime + 1)
-				setClockStarted(true)
+		if(apiData){
+			if(!!!isClockStarted){
+				setLocalUNIXTime(apiData.unixtime)
 				setInterval(() => {
-					setLocalUnixTime(prev => prev + 1)
+					setLocalUNIXTime(prev => prev + 1)
 				}, 1000)
+				setClockStarted(true)
 			}else{
-				setLocalUnixTime(data.unixtime + 1)
-				console.log(`時刻合わせ完了 - ${new Date(data.unixtime * 1000).toString()}`)
+				console.log(`UNIXタイムスタンプ新規受信 => ${apiData.unixtime}`)
+				setLocalUNIXTime(apiData.unixtime)
+				console.log(`時刻合わせ完了 - ${new Date(apiData.unixtime * 1000).toString()}`)
+				setUpdateFlag(prev => !prev)
 			}
 		}
-	}, [data])
+	}, [apiData])
 
 	useEffect(() => {
-		if(error) setLocalUnixTime(-1)
-	}, [error])
+		if(apiErr){
+			setLocalUNIXTime(-1)
+		}
+	}, [apiErr])
 
-	return {
-		localUNIXTime
-	}
+	return { localUNIXTime, updateFlag }
 }
 
 export default useUNIXTime
