@@ -31,14 +31,14 @@ const useUNIXTime = () => {
 	useEffect(() => {
 		if(apiData){
 			if(!!!isClockStarted){
-				setLocalUNIXTime(apiData.unixtime)
+				setLocalUNIXTime(apiData.unixtime - Number(process.env.NEXT_PUBLIC_TIME_ADJUSTMENT_MINUS))
 				setInterval(() => {
 					setLocalUNIXTime(prev => prev + 1)
 				}, 1000)
 				setClockStarted(true)
 			}else{
 				console.log(`UNIXタイムスタンプ新規受信 => ${apiData.unixtime}`)
-				setLocalUNIXTime(apiData.unixtime)
+				setLocalUNIXTime(apiData.unixtime - Number(process.env.NEXT_PUBLIC_TIME_ADJUSTMENT_MINUS))
 				console.log(`時刻合わせ完了 - ${new Date(apiData.unixtime * 1000).toString()}`)
 				setUpdateFlag(prev => !prev)
 			}

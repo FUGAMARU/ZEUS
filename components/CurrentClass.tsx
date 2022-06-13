@@ -37,6 +37,7 @@ const CurrentClass = (props: Props) => {
 	const [percentage, setPercentage] = useState(0)
 	const [remainingTime, setRemainingTime] = useState("-")
 	const [hourLabel, setHourLabel] = useState("取得中…")
+	const [lastUpdate, setLastUpdate] = useState(0) //判定時間の1分間で毎秒Firebaseにデーター取りに行かないようにするための判定用state
 
 	useEffect(() => {
 		//残り時間を計算・表示する
@@ -51,7 +52,9 @@ const CurrentClass = (props: Props) => {
 
 		//授業開始・終了時間に授業情報の取得を行う
 		const timings = [930, 1015, 1100, 1110, 1155, 1240, 1330, 1415, 1500, 1510, 1555, 1640]
-		if(timings.includes(getTimestamp(props.UNIXTime))){
+		const timestamp = getTimestamp(props.UNIXTime)
+		if(timings.includes(timestamp) && timestamp !== lastUpdate){
+			setLastUpdate(timestamp)
 			settingLectureData()
 		}
 	}, [props.UNIXTime])
