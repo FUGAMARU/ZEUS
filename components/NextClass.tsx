@@ -35,13 +35,13 @@ const NextClass = (props: Props) => {
 	})
 	const [percentage, setPercentage] = useState(0)
 	const [remainingTime, setRemainingTime] = useState("-")
-	const [hourLabel, setHourLabel] = useState("取得中…")
+	const [isInSession, setInSession] = useState(false) //授業が開講中かどうか
 	const [lastUpdate, setLastUpdate] = useState(0) //判定時間の1分間で毎秒Firebaseにデーター取りに行かないようにするための判定用state
 
 	useEffect(() => {
 		//残り時間を計算・表示する
 		const receivedRemainingTime = getRemainingTime(props.UNIXTime, "next")
-		if(receivedRemainingTime === null){ //授業時間外の場合
+		if(receivedRemainingTime === null || !!!isInSession){ //授業時間外の場合
 			setPercentage(0)
 			setRemainingTime("-")
 		}else{
@@ -77,7 +77,7 @@ const NextClass = (props: Props) => {
 				teacher: "ㅤㅤㅤㅤㅤㅤㅤ",
 				classroomLink: "https://classroom.google.com/",
 			})
-			setHourLabel("")
+			setInSession(false)
 		}else{
 			setLectureData({
 				name: res.name,
@@ -86,7 +86,7 @@ const NextClass = (props: Props) => {
 				teacher: res.teacher,
 				classroomLink: res.classroom,
 			})
-			setHourLabel(String(whattimeIsIt(props.UNIXTime, "next") + 1) + "時限目")
+			setInSession(true)
 		}
 	}
 
@@ -107,7 +107,7 @@ const NextClass = (props: Props) => {
 					</Box>
 				</Box>
 				<Box px={2}>
-					<Text className="ksb" textAlign="center" bg="#5ae7d3" fontSize="0.7rem" mb="0.5rem" w="100%" h="0.9rem">{hourLabel}</Text>
+					<Text className="ksb" textAlign="center" bg="#5ae7d3" fontSize="0.7rem" mb="0.5rem" w="100%" h="0.9rem">{isInSession ? `${whattimeIsIt(props.UNIXTime, "next") + 1}時限目` : ""}</Text>
 					<Text className="kb" textAlign="center">{lectureData.name}</Text>
 					<hr className="class-hr"/>
 					<Flex justifyContent="center" alignItems="center">
