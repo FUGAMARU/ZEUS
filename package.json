@@ -27,6 +27,7 @@
     "react-circular-progressbar": "^2.0.4",
     "react-cropper": "^2.1.8",
     "react-dom": "^18.0.0",
+    "recoil": "^0.7.3",
     "socket.io-client": "^4.4.1",
     "swr": "^1.2.2",
     "windups": "^1.2.0",

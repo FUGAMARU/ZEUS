@@ -3,7 +3,7 @@ import { getApps, initializeApp } from "firebase/app"
 import { getAuth } from "firebase/auth"
 import { GoogleAuthProvider } from "firebase/auth"
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
-import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore"
+import { doc, getDoc, getFirestore, setDoc, collection, addDoc } from "firebase/firestore"
 import { whattimeIsIt } from "./functions"
 
 let app
@@ -162,4 +162,18 @@ const getClassName = (uid: string): Promise<any> => {
 	})
 }
 
-export { auth, provider, checkUserDataExists, registerUserInformation, getUserData, getLectureData, getClassName }
+const createBBSThread = (uid: string, title: string, UNIXTime: number): Promise<any> => {
+	return new Promise(async (resolve) => {
+		const colRef = collection(db, "threads")
+		await addDoc(colRef, {
+			createdAt: UNIXTime,
+			createdBy: uid,
+			lastUpdate: UNIXTime,
+			responses: [],
+			title: title
+		})
+		resolve("1")
+	})
+}
+
+export { auth, provider, checkUserDataExists, registerUserInformation, getUserData, getLectureData, getClassName, createBBSThread }

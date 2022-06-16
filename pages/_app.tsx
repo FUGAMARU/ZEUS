@@ -15,6 +15,7 @@ import "animate.css"
 import { ChakraProvider } from "@chakra-ui/react"
 import { SocketContext, socket } from "../contexts/SocketIO"
 import "focus-visible/dist/focus-visible" //キーボード操作によるフォーカス以外は要素のアウトラインを表示しない
+import { RecoilRoot } from "recoil"
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
 	useEffect(() => {
@@ -32,9 +33,11 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
 				<meta name="viewport" content="initial-scale=1.0, width=device-width" />
 			</Head>
 			<ChakraProvider>
-				<SocketContext.Provider value={socket}>
-					<Component {...pageProps} />
-				</SocketContext.Provider>
+				<RecoilRoot>
+					<SocketContext.Provider value={socket}>
+						<Component {...pageProps} />
+					</SocketContext.Provider>
+				</RecoilRoot>
 			</ChakraProvider>
 		</>
 	)

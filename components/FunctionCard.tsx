@@ -1,8 +1,11 @@
 //Custom Hooks
-import { useTouchDevice } from '../hooks/useTouchDevice'
+import { useTouchDevice } from "../hooks/useTouchDevice"
 
 //Chakra UI Components
-import { Box, Button, Text, Flex, Tooltip, Popover, PopoverTrigger, PopoverContent, PopoverBody, PopoverHeader, PopoverArrow, PopoverCloseButton, Input } from '@chakra-ui/react'
+import { Box, Text, Flex, Tooltip, Popover, PopoverTrigger, PopoverContent, PopoverBody, PopoverArrow, PopoverCloseButton } from '@chakra-ui/react'
+
+//Custom Components
+import BBSPopover from "./BBSPopover"
 
 //Libraries
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -12,7 +15,8 @@ interface Props {
 	title: string,
 	gradientStartHex: string,
 	gradientEndHex: string,
-	childComponent: JSX.Element
+	childComponent: JSX.Element,
+	UID?: string
 }
 
 const FunctionCard = (props: Props) => {
@@ -23,26 +27,7 @@ const FunctionCard = (props: Props) => {
 			<Flex justifyContent="space-between" alignItems="center" mx={5}>
 				<Text className="rmb" color="#2b2b2b" fontSize={23}>{props.title}</Text>
 				{props.title === "BBS" ? 
-				<Popover closeOnBlur={false}>
-					<PopoverTrigger>
-						<Box>
-							<Tooltip label="スレッドを作成" isDisabled={isTouchDevice ? true: false}>
-								<Box fontSize="1.3rem" color="#474747" cursor="pointer"><FontAwesomeIcon icon={faPlus}></FontAwesomeIcon></Box>
-							</Tooltip>
-						</Box>
-					</PopoverTrigger>
-					<PopoverContent borderRadius={5} p={2}>
-						<PopoverHeader>
-							<Text className="ksb" fontSize="0.9rem" textAlign="center">スレッド作成</Text>
-						</PopoverHeader>
-						<PopoverArrow />
-						<PopoverCloseButton />
-						<PopoverBody textAlign="center">
-							<Input placeholder="スレッドタイトルを入力…" size="sm" borderRadius={5} mt={2} textAlign="center" />
-							<Button size="xs" w="100%" mt={2} colorScheme="blue">作成する</Button>
-						</PopoverBody>
-					</PopoverContent>
-				</Popover>
+					<BBSPopover UID={props.UID} />
 				: props.title === "お知らせ" ?
 				<Popover>
 					<PopoverTrigger>

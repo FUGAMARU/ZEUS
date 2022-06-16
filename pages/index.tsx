@@ -103,7 +103,7 @@ const Index: NextPage = () => {
 						<FunctionCard title="次の授業" gradientStartHex="#09e7d3" gradientEndHex="#008bb6" childComponent={<NextClass UID={UID} UNIXTime={localUNIXTime} updateFlag={updateFlag} />} />
 						<FunctionCard title="FileDispenser" gradientStartHex="#ffd97b" gradientEndHex="#f6a742" childComponent={<FileDispenser />} />
 						<FunctionCard title="チャット" gradientStartHex="#09e863" gradientEndHex="#00b684" childComponent={<Chat ClassID={classID} userName={userName} iconSrc={userIconSrc} />} />
-						<FunctionCard title="BBS" gradientStartHex="#a2b6df" gradientEndHex="#33569b" childComponent={<BBS />} />
+						<FunctionCard title="BBS" gradientStartHex="#a2b6df" gradientEndHex="#33569b" UID={UID} childComponent={<BBS />} />
 						<FunctionCard title="お知らせ" gradientStartHex="#efbfd5" gradientEndHex="#9d61fd" childComponent={<Information />} />
 						<Box bg="teal.300">システムログ</Box>
 					</SimpleGrid>
