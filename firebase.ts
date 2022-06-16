@@ -3,7 +3,7 @@ import { getApps, initializeApp } from "firebase/app"
 import { getAuth } from "firebase/auth"
 import { GoogleAuthProvider } from "firebase/auth"
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
-import { doc, getDoc, getFirestore, setDoc, collection, addDoc } from "firebase/firestore"
+import { doc, getDoc, getFirestore, setDoc, collection, addDoc, getDocs, query, orderBy, limit, startAt } from "firebase/firestore"
 import { whattimeIsIt } from "./functions"
 
 let app
@@ -101,6 +101,18 @@ interface ObjectTypes {
 	zoom: string
 }
 
+interface Thread {
+	createdAt: number,
+	createdBy: string,
+	lastUpdate: number,
+	responses: {
+		uid?: string,
+		sentAt?: number,
+		text?: string
+	}[],
+	title: string
+}
+
 const getLectureData = (target: string, uid: string, UNIXTime: number): Promise<any> => { //return => object, ""(授業未開講時)
 	return new Promise(async (resolve) => {
 		const hour = whattimeIsIt(UNIXTime, target) //今が何時限目なのか
@@ -149,7 +161,7 @@ const getLectureData = (target: string, uid: string, UNIXTime: number): Promise<
 	})
 }
 
-const getClassName = (uid: string): Promise<any> => {
+const getClassName = (uid: string): Promise<string> => {
 	return new Promise(async (resolve) => {
 		//UIDから所属クラスを特定
 		const studentDoc = await getDoc(doc(db, "students", uid))
@@ -162,18 +174,47 @@ const getClassName = (uid: string): Promise<any> => {
 	})
 }
 
-const createBBSThread = (uid: string, title: string, UNIXTime: number): Promise<any> => {
-	return new Promise(async (resolve) => {
-		const colRef = collection(db, "threads")
-		await addDoc(colRef, {
-			createdAt: UNIXTime,
-			createdBy: uid,
-			lastUpdate: UNIXTime,
-			responses: [],
-			title: title
-		})
-		resolve("1")
+const getThreads = (startUNIXTime: number): Promise<string[][]> => {
+	return new Promise (async (resolve) => {
+		let titles: string[][] = []
+		if(startUNIXTime === 0){
+			const querySnapshot = await getDocs(query(collection(db, "threads"), orderBy("createdAt", "desc"), limit(20)))
+			querySnapshot.forEach((doc) => {
+				titles.push([doc.id, doc.data().title])
+			})
+		}else{
+			const querySnapshot = await getDocs(query(collection(db, "threads"), orderBy("createdAt", "desc"), startAt(startUNIXTime), limit(20)))
+			querySnapshot.forEach((doc) => {
+				titles.push([doc.id, doc.data().title])
+			})
+		}
+		resolve(titles)
 	})
 }
 
-export { auth, provider, checkUserDataExists, registerUserInformation, getUserData, getLectureData, getClassName, createBBSThread }
+const createBBSThread = (uid: string, title: string, UNIXTime: number): Promise<string[]> => {
+	return new Promise(async (resolve) => {
+		/*for(let i=0; i < 10; i++){
+			const colRef = collection(db, "threads")
+			await addDoc(colRef, {
+				createdAt: UNIXTime,
+				createdBy: uid,
+				lastUpdate: UNIXTime,
+				responses: [],
+				title: `テストスレッド${i + 1}`
+			})
+		}*/
+		
+		const threadsRef = collection(db, "threads")
+		const newRef = await addDoc(threadsRef, {
+			title: title,
+			createdAt: UNIXTime,
+			createdBy: uid,
+			lastUpdate: UNIXTime,
+			responses: []
+		} as Thread)
+		resolve([newRef.id, title])
+	})
+}
+
+export { auth, provider, checkUserDataExists, registerUserInformation, getUserData, getLectureData, getClassName, getThreads, createBBSThread }

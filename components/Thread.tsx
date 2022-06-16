@@ -7,7 +7,8 @@ import { faAngleLeft, faArrowRotateRight } from "@fortawesome/free-solid-svg-ico
 
 interface Props {
 	title: string,
-	backToList: VoidFunction
+	backToList: VoidFunction,
+	id: string
 }
 
 const Thread = (props: Props) => {

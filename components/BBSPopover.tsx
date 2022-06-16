@@ -1,5 +1,5 @@
 //React Hooks
-import { useRef } from "react"
+import { useRef, useState } from "react"
 
 //Custom Hooks
 import { useTouchDevice } from "../hooks/useTouchDevice"
@@ -11,8 +11,9 @@ import { Box, Popover, PopoverTrigger, PopoverContent, PopoverHeader, PopoverArr
 import { createBBSThread } from "../firebase"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPlus } from "@fortawesome/free-solid-svg-icons"
-import { useRecoilValue } from "recoil"
+import { useRecoilState, useRecoilValue } from "recoil"
 import { RecoilUNIXTime } from "../atoms/UNXITimeAtom"
+import { ThreadTitlesAtom } from "../atoms/ThreadTitlesAtom"
 
 interface Props {
     UID: string | undefined
@@ -22,18 +23,22 @@ const BBSPopover = (props: Props) => {
     const isTouchDevice = useTouchDevice()
     const inputRef = useRef<HTMLInputElement>(null)
 	const recoilUNIXTime = useRecoilValue(RecoilUNIXTime)
+	const [threadTitles, pushThreadTitles] = useRecoilState(ThreadTitlesAtom)
+	const [isOpen, setOpen] = useState<boolean>() //Popoverが開いているかどうか
 
 	const handleButtonClick = async () => {
-		if(props.UID && inputRef.current?.value) {
+		if(props.UID && inputRef.current?.value){
 			console.log("Requested to create new BBS thread with the informations")
 			console.log(props.UID, inputRef.current.value, recoilUNIXTime)
-			await createBBSThread(props.UID, inputRef.current.value, recoilUNIXTime)
+			const createdTitle = await createBBSThread(props.UID, inputRef.current.value, recoilUNIXTime)
 			console.log("書き込み完了！")
+			pushThreadTitles([createdTitle, ...threadTitles])
+			setOpen(false)
 		}
 	}
 
     return(
-		<Popover closeOnBlur={false}>
+		<Popover closeOnBlur={false} isOpen={isOpen} onOpen={() => setOpen(true)} onClose={() => setOpen(false)}>
 			<PopoverTrigger>
 				<Box>
 					<Tooltip label="スレッドを作成" isDisabled={isTouchDevice ? true: false}>

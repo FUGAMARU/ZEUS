@@ -1,5 +1,5 @@
 //React Hooks
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 //Chakra UI Components
 import { Box, VStack, StackDivider } from "@chakra-ui/react"
@@ -8,13 +8,29 @@ import { Box, VStack, StackDivider } from "@chakra-ui/react"
 import ListHeading from "./ListHeading"
 import Thread from "./Thread"
 
+//Libraries
+import { getThreads } from "../firebase"
+import { useRecoilState } from "recoil"
+import { ThreadTitlesAtom } from "../atoms/ThreadTitlesAtom"
+
 const BBS = () => {
+	const [threadTitles, setThreadTitles] = useRecoilState(ThreadTitlesAtom)
+	const [openedID, setOpenedID] = useState("") //スレッドリストから開かれたスレッドのID
+
+	useEffect(() => {
+		(async() => {
+			const res = await getThreads(0)
+			setThreadTitles(res)
+		})()
+	}, [])
+
+	//画面遷移アニメーション関連
 	const [listClasses, setListClasses] = useState("")
 	const [threadClasses, setThreadClasses] = useState("")
 	const [displayFlag, setdisplayFlag] = useState(false)
 	const [threadTitle, setThreadTitle] = useState("")
 
-	const openThread = (title: string) => {
+	const openThread = (title: string): void => {
 		setThreadTitle(title)
 		setListClasses("animate__animated animate__fadeOutLeft")
 		setTimeout(() => {
@@ -34,84 +50,20 @@ const BBS = () => {
 	return(
 		<Box mx={2} overflowX="hidden">
 			<VStack className={listClasses} style={displayFlag ? {display: "none"} : {}} align="stretch" divider={<StackDivider borderColor="gray.200"/>} overflowY="auto" maxH={{base: 400, md:460, lg: 500}}>
-
-				<Box onClick={() => openThread("元葬儀屋のワイが神奈川県警の悪事を淡々と話すスレ")}>
-					<ListHeading title="元葬儀屋のワイが神奈川県警の悪事を淡々と話すスレ" lastUpdate="1分以内"/> {/*1分以内、○分前、○時間前、○日前、○ヶ月前、1年以上前*/}
-				</Box>
-
-				<Box onClick={() => openThread("ゲーセンで出会った不思議な子の話")}>
-					<ListHeading title="ゲーセンで出会った不思議な子の話" lastUpdate="3分前"/>
-				</Box>
-
-				<Box onClick={() => openThread("もう時効だから話す")}>
-					<ListHeading title="もう時効だから話す" lastUpdate="32分前"/>
-				</Box>
-
-				<Box onClick={() => openThread("うまい棒配ってたら人生変わったでござるの巻")}>
-					<ListHeading title="うまい棒配ってたら人生変わったでござるの巻" lastUpdate="2時間前"/>
-				</Box>
-
-				<Box onClick={() => openThread("モスバーガーのきれいな食い方教えれ")}>
-					<ListHeading title="モスバーガーのきれいな食い方教えれ" lastUpdate="1日前"/>
-				</Box>
-
-				<Box onClick={() => openThread("東京に5万隠した、見つけられるかな？？")}>
-					<ListHeading title="東京に5万隠した、見つけられるかな？？" lastUpdate="15日前"/>
-				</Box>
-
-				<Box onClick={() => openThread("おまいら、俺のアパートが祭りかもしれん")}>
-					<ListHeading title="おまいら、俺のアパートが祭りかもしれん" lastUpdate="28日前"/>
-				</Box>
-
-				<Box onClick={() => openThread("信じられないかもしれないが変な体験した")}>
-					<ListHeading title="信じられないかもしれないが変な体験した" lastUpdate="3ヶ月前"/>
-				</Box>
-
-				<Box onClick={() => openThread("去年のGWでの一人旅でのお話")}>
-					<ListHeading title="去年のGWでの一人旅でのお話" lastUpdate="1年以上前"/>
-				</Box>
-
-				<Box onClick={() => openThread("元葬儀屋のワイが神奈川県警の悪事を淡々と話すスレ")}>
-					<ListHeading title="元葬儀屋のワイが神奈川県警の悪事を淡々と話すスレ" lastUpdate="1分以内"/> {/*1分以内、○分前、○時間前、○日前、○ヶ月前、1年以上前*/}
-				</Box>
-
-				<Box onClick={() => openThread("ゲーセンで出会った不思議な子の話")}>
-					<ListHeading title="ゲーセンで出会った不思議な子の話" lastUpdate="3分前"/>
-				</Box>
-
-				<Box onClick={() => openThread("もう時効だから話す")}>
-					<ListHeading title="もう時効だから話す" lastUpdate="32分前"/>
-				</Box>
-
-				<Box onClick={() => openThread("うまい棒配ってたら人生変わったでござるの巻")}>
-					<ListHeading title="うまい棒配ってたら人生変わったでござるの巻" lastUpdate="2時間前"/>
-				</Box>
-
-				<Box onClick={() => openThread("モスバーガーのきれいな食い方教えれ")}>
-					<ListHeading title="モスバーガーのきれいな食い方教えれ" lastUpdate="1日前"/>
-				</Box>
-
-				<Box onClick={() => openThread("東京に5万隠した、見つけられるかな？？")}>
-					<ListHeading title="東京に5万隠した、見つけられるかな？？" lastUpdate="15日前"/>
-				</Box>
-
-				<Box onClick={() => openThread("おまいら、俺のアパートが祭りかもしれん")}>
-					<ListHeading title="おまいら、俺のアパートが祭りかもしれん" lastUpdate="28日前"/>
-				</Box>
-
-				<Box onClick={() => openThread("信じられないかもしれないが変な体験した")}>
-					<ListHeading title="信じられないかもしれないが変な体験した" lastUpdate="3ヶ月前"/>
-				</Box>
-
-				<Box onClick={() => openThread("去年のGWでの一人旅でのお話")}>
-					<ListHeading title="去年のGWでの一人旅でのお話" lastUpdate="1年以上前"/>
-				</Box>
-
+				{threadTitles.map((v, k) => {
+					return(
+						<Box key={k} onClick={() => { openThread(v[1]); setOpenedID(v[0]) }}>
+							<ListHeading title={v[1]} lastUpdate="1分以内"/> {/*1分以内、○分前、○時間前、○日前、○ヶ月前、1年以上前*/}
+						</Box>
+					)
+				})}
 			</VStack>
-
+			
+			
 			<Box className={threadClasses} style={displayFlag ? {} : {display: "none"}}>
-				<Thread backToList={backToList} title={threadTitle}/>
+				<Thread backToList={backToList} title={threadTitle} id={openedID} />
 			</Box>
+	
 		</Box>
 	)
 }
