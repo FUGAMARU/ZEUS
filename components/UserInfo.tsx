@@ -15,14 +15,14 @@ import { auth } from "../firebase"
 //Contexts
 import { SocketContext } from "../contexts/SocketIO"
 
-interface Props {
-	userName: string,
-	userIconSrc: string
-}
+//Global State Management
+import { useRecoilValue } from "recoil"
+import { UserdataAtom } from "../atoms/UserdataAtom"
 
-const UserInfo = (props: Props) => {
+const UserInfo = () => {
 	const responsiveType = useResponsive()
 	const popoverRef = useRef(null)
+	const userdata = useRecoilValue(UserdataAtom)
 	const [editProfileTextColor, setEditProfileTextColor] = useState("#4a4848")
 	const [signOutTextColor, setSignOutTextColor] = useState("#4a4848")
 	const [WSStatusMessage, setWSStatusMessage] = useState("NG")
@@ -60,20 +60,20 @@ const UserInfo = (props: Props) => {
 					<Box px={{base: 3, md: 5, lg: 7}} py={2} borderRadius={25} cursor="pointer" transition="0.4s all ease-out" _hover={{bg: "#f5f5f5", boxShadow: "5px 5px 11px #dedede, -5px -5px 11px #ffffff"}} style={isOpen ? {backgroundColor: "#f5f5f5", boxShadow: "5px 5px 11px #dedede, -5px -5px 11px #ffffff"} : {}}>					
 						{responsiveType === "SmartPhone" &&
 							<Flex justify="space-between">
-								<Center className="user-info-name"><p className="ksb tpl" style={{fontSize: "0.8rem", maxWidth: "4.5rem"}}>{props.userName}</p></Center>
-								<Avatar className="user-info-icon" ml={2} size="sm" name={props.userName} src={props.userIconSrc} />
+								<Center className="user-info-name"><p className="ksb tpl" style={{fontSize: "0.8rem", maxWidth: "4.5rem"}}>{userdata.name}</p></Center>
+								<Avatar className="user-info-icon" ml={2} size="sm" name={userdata.name} src={userdata.iconUrl} />
 							</Flex>
 						}
 						{responsiveType === "Tablet" &&
 							<Flex justify="space-between" className="user-info-wrapper">
-								<Center className="user-info-name"><p className="ksb tpl" style={{maxWidth: "10.5rem"}}>{props.userName}</p></Center>
-								<Avatar className="user-info-icon" ml={2} size="sm" name={props.userName} src={props.userIconSrc} />
+								<Center className="user-info-name"><p className="ksb tpl" style={{maxWidth: "10.5rem"}}>{userdata.name}</p></Center>
+								<Avatar className="user-info-icon" ml={2} size="sm" name={userdata.name} src={userdata.iconUrl} />
 							</Flex>
 						}
 						{responsiveType === "PC" &&
 							<Flex justify="space-between" className="user-info-wrapper">
-								<Center className="user-info-name"><p className="ksb tpl" style={{fontSize: "1.1rem", maxWidth: "22.5rem"}}>{props.userName}</p></Center>
-								<Avatar className="user-info-icon" ml={2} size="sm" name={props.userName} src={props.userIconSrc} />
+								<Center className="user-info-name"><p className="ksb tpl" style={{fontSize: "1.1rem", maxWidth: "22.5rem"}}>{userdata.name}</p></Center>
+								<Avatar className="user-info-icon" ml={2} size="sm" name={userdata.name} src={userdata.iconUrl} />
 							</Flex>
 						}
 					</Box>

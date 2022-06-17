@@ -11,15 +11,15 @@ import { Box, Popover, PopoverTrigger, PopoverContent, PopoverHeader, PopoverArr
 import { createBBSThread } from "../firebase"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPlus } from "@fortawesome/free-solid-svg-icons"
-import { useRecoilState, useRecoilValue } from "recoil"
 import { RecoilUNIXTime } from "../atoms/UNXITimeAtom"
 import { ThreadTitlesAtom } from "../atoms/ThreadTitlesAtom"
 
-interface Props {
-    UID: string | undefined
-}
+//Global State Management
+import { useRecoilState, useRecoilValue } from "recoil"
+import { UserdataAtom } from "../atoms/UserdataAtom"
 
-const BBSPopover = (props: Props) => {
+const BBSPopover = () => {
+	const userdata = useRecoilValue(UserdataAtom)
     const isTouchDevice = useTouchDevice()
     const inputRef = useRef<HTMLInputElement>(null)
 	const recoilUNIXTime = useRecoilValue(RecoilUNIXTime)
@@ -27,10 +27,10 @@ const BBSPopover = (props: Props) => {
 	const [isOpen, setOpen] = useState<boolean>() //Popoverが開いているかどうか
 
 	const handleButtonClick = async () => {
-		if(props.UID && inputRef.current?.value){
+		if(userdata.uid && inputRef.current?.value){
 			console.log("Requested to create new BBS thread with the informations")
-			console.log(props.UID, inputRef.current.value, recoilUNIXTime)
-			const createdTitle = await createBBSThread(props.UID, inputRef.current.value, recoilUNIXTime)
+			console.log(userdata.uid, inputRef.current.value, recoilUNIXTime)
+			const createdTitle = await createBBSThread(userdata.uid, inputRef.current.value, recoilUNIXTime)
 			console.log("書き込み完了！")
 			pushThreadTitles([createdTitle, ...threadTitles])
 			setOpen(false)

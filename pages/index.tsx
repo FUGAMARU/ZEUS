@@ -31,16 +31,17 @@ import Loading from "../components/Loading"
 import { auth, checkUserDataExists, getUserData, getClassName } from "../firebase"
 import { onAuthStateChanged } from "firebase/auth"
 
+//Global State Management
+import { useRecoilState } from "recoil"
+import { UserdataAtom } from "../atoms/UserdataAtom"
+
 const Index: NextPage = () => {
 	const { localUNIXTime, updateFlag }  = useUNIXTime() //UNIXTimeの内部管理処理
 	const responsiveType = useResponsive() //リアクティブな画面幅タイプの変数
 	const isTouchDevice = useTouchDevice() //タッチ可能かどうか
-	const [UID, setUID] = useState("") //ログイン中ユーザーのUID
 	const [isAuthenicated, setAuthenicated] = useState<null|boolean>(null) //ログインされているか否か True => 通常のZEUSポータル, False => ログイン・登録ページ, null => ローディング画面
-	const [userName, setUserName] = useState("") //ユーザー名
-	const [userIconSrc, setUserIconSrc] = useState("") //ユーザーアイコンの画像URL
-	const [className, setClassName] = useState("") //所属クラスの表示名
-	const [classID, setClassID] = useState("") //所属クラスID	
+
+	const [userdata, setUserdata] = useRecoilState(UserdataAtom) //ユーザーデーター
 
 	useEffect(() => {
 		const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -52,11 +53,13 @@ const Index: NextPage = () => {
 					const userExists = await checkUserDataExists(user.uid)
 					if(userExists){ //ログインされている状態でユーザー情報の登録まで済んでいる
 						const res = await getUserData(user.uid)
-						setUserName(res.name)
-						setUserIconSrc(res.iconSrc)
-						setUID(user.uid)
-						setClassName(await getClassName(user.uid))
-						setClassID(res.class)
+						setUserdata({
+							uid: user.uid,
+							name: res.name,
+							iconUrl: res.iconSrc,
+							classID: res.class,
+							className: await getClassName(user.uid)
+						})
 						setAuthenicated(true) //ローディング画面解除
 					}else{ //ログインされている状態だけどユーザー情報の登録は済んでいない
 						setAuthenicated(null) //ローディング画面を表示させて
@@ -92,18 +95,18 @@ const Index: NextPage = () => {
 							<Image src="/zeus.svg" width={269} height={70} />
 						</Center>
 						<Center>
-							<UserInfo userName={userName} userIconSrc={userIconSrc} />
+							<UserInfo />
 						</Center>	
 					</SimpleGrid>
 
-					<Text className="ksb" textAlign="center" fontSize="0.8rem" mt={3}>{className} ({classID})</Text>
+					<Text className="ksb" textAlign="center" fontSize="0.8rem" mt={3}>{userdata.className} ({userdata.classID})</Text>
 	
 					<SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={5} my={3} mx={3}>
-						<FunctionCard title="現在の授業" gradientStartHex="#dfec51" gradientEndHex="#73aa0a" childComponent={<CurrentClass UID={UID} UNIXTime={localUNIXTime} updateFlag={updateFlag} />} />
-						<FunctionCard title="次の授業" gradientStartHex="#09e7d3" gradientEndHex="#008bb6" childComponent={<NextClass UID={UID} UNIXTime={localUNIXTime} updateFlag={updateFlag} />} />
+						<FunctionCard title="現在の授業" gradientStartHex="#dfec51" gradientEndHex="#73aa0a" childComponent={<CurrentClass UNIXTime={localUNIXTime} updateFlag={updateFlag} />} />
+						<FunctionCard title="次の授業" gradientStartHex="#09e7d3" gradientEndHex="#008bb6" childComponent={<NextClass UNIXTime={localUNIXTime} updateFlag={updateFlag} />} />
 						<FunctionCard title="FileDispenser" gradientStartHex="#ffd97b" gradientEndHex="#f6a742" childComponent={<FileDispenser />} />
-						<FunctionCard title="チャット" gradientStartHex="#09e863" gradientEndHex="#00b684" childComponent={<Chat ClassID={classID} userName={userName} iconSrc={userIconSrc} />} />
-						<FunctionCard title="BBS" gradientStartHex="#a2b6df" gradientEndHex="#33569b" UID={UID} childComponent={<BBS />} />
+						<FunctionCard title="チャット" gradientStartHex="#09e863" gradientEndHex="#00b684" childComponent={<Chat />} />
+						<FunctionCard title="BBS" gradientStartHex="#a2b6df" gradientEndHex="#33569b" childComponent={<BBS />} />
 						<FunctionCard title="お知らせ" gradientStartHex="#efbfd5" gradientEndHex="#9d61fd" childComponent={<Information />} />
 						<Box bg="teal.300">システムログ</Box>
 					</SimpleGrid>

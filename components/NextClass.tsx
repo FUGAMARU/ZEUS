@@ -18,13 +18,17 @@ import { getLectureData } from "../firebase"
 //Useful Functions
 import { getTimestamp, whattimeIsIt, getRemainingTime } from "../functions"
 
+//Global State Management
+import { useRecoilValue } from "recoil"
+import { UserdataAtom } from "../atoms/UserdataAtom"
+
 interface Props {
-	UID: string,
 	UNIXTime: number,
 	updateFlag: boolean
 }
 
-const NextClass = (props: Props) => {	
+const NextClass = (props: Props) => {
+	const userdata = useRecoilValue(UserdataAtom)
 	//カードに表示するデーター
 	const [lectureData, setLectureData] = useState({
 		name: "取得中…",
@@ -66,7 +70,7 @@ const NextClass = (props: Props) => {
 
 	//Firebaseからデーターを引っ張ってきてstateにセットする
 	const settingLectureData = async() => {
-		const res = await getLectureData("next", props.UID, props.UNIXTime)
+		const res = await getLectureData("next", userdata.uid, props.UNIXTime)
 		console.log("==========次の授業情報==========")
 		console.log(res)
 		if(res === ""){

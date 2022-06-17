@@ -14,11 +14,9 @@ import { faPaperPlane } from "@fortawesome/free-solid-svg-icons"
 //Contexts
 import { SocketContext } from "../contexts/SocketIO"
 
-interface Props {
-	ClassID: string,
-	userName: string,
-	iconSrc: string
-}
+//Global State Management
+import { useRecoilValue } from "recoil"
+import { UserdataAtom } from "../atoms/UserdataAtom"
 
 interface MessageObject{
 	scope?: string
@@ -29,7 +27,8 @@ interface MessageObject{
 	message: string
 }
 
-const Chat = (props: Props) => {
+const Chat = () => {
+	const userdata = useRecoilValue(UserdataAtom)
 	const socket = useContext(SocketContext) //Socket.IOオブジェクトのContext
 	const [classChat, setClassChat] = useState<MessageObject[]>([])
 	const [globalChat, setGlobalChat] = useState<MessageObject[]>([])
@@ -37,15 +36,15 @@ const Chat = (props: Props) => {
 	const [message, setMessage] = useState("")
 
 	useEffect(() => {
-		if(socket && socket.connected && !!!socket.disconnected) socket.emit("register", props.ClassID)
+		if(socket && socket.connected && !!!socket.disconnected) socket.emit("register", userdata.classID)
 
 		socket.on("welcome", () => {
-			socket.emit("register", props.ClassID)
+			socket.emit("register", userdata.classID)
 		})
 
 		socket.on("receiveMessage", (obj: MessageObject) => {
 			console.log(`新規メッセージ受信 ${JSON.stringify(obj)}`)
-			if(`${obj.userName}${obj.iconSrc}` === `${props.userName}${props.iconSrc}`){ //WebSocketサーバーから送られてきたメッセージが自分のものだったら(名前とアイコンのURLを合わせたもので判定)
+			if(`${obj.userName}${obj.iconSrc}` === `${userdata.name}${userdata.iconUrl}`){ //WebSocketサーバーから送られてきたメッセージが自分のものだったら(名前とアイコンのURLを合わせたもので判定)
 				if(obj.scope === "global"){
 					setGlobalChat(prevArr => [...prevArr, {
 						type: "me",
@@ -83,22 +82,22 @@ const Chat = (props: Props) => {
 		return () => { socket.close() }
 	}, [])
 
-	socket.on("connect", () => { if(socket.id) socket.emit("register", props.ClassID) })
+	socket.on("connect", () => { if(socket.id) socket.emit("register", userdata.classID) })
 
 	const sendMessage = () => {
 		if(chatScope){
 			socket.emit("sendMessage", {
 				scope: "class",
-				classID: props.ClassID,
-				userName: props.userName,
-				iconSrc: props.iconSrc,
+				classID: userdata.classID,
+				userName: userdata.name,
+				iconSrc: userdata.iconUrl,
 				message: message
 			})
 		}else{
 			socket.emit("sendMessage", {
 				scope: "global",
-				userName: props.userName,
-				iconSrc: props.iconSrc,
+				userName: userdata.name,
+				iconSrc: userdata.iconUrl,
 				message: message
 			})
 		}

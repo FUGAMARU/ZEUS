@@ -12,8 +12,7 @@ interface Props {
 	title: string,
 	gradientStartHex: string,
 	gradientEndHex: string,
-	childComponent: JSX.Element,
-	UID?: string
+	childComponent: JSX.Element
 }
 
 const FunctionCard = (props: Props) => {
@@ -23,7 +22,7 @@ const FunctionCard = (props: Props) => {
 		<Box bg="white" shadow="xl" borderRadius={15} py={4} transition="0.4s all ease-out" _hover={!isTouchDevice ? {transform: "scale(1.05, 1.05)"} : {}}>
 			<Flex justifyContent="space-between" alignItems="center" mx={5}>
 				<Text className="rmb" color="#2b2b2b" fontSize={23}>{props.title}</Text>
-				{props.title === "BBS" ? <BBSPopover UID={props.UID} /> : props.title === "お知らせ" ? <InformationPopover /> : null}
+				{props.title === "BBS" ? <BBSPopover /> : props.title === "お知らせ" ? <InformationPopover /> : null}
 			</Flex>
 			<Box h={1} w="80%" mb={3} bgGradient={`linear(to-r, ${props.gradientStartHex}, ${props.gradientEndHex})`} borderRightRadius={10}></Box>
 			{props.childComponent}
