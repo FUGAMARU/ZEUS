@@ -10,17 +10,22 @@ import Thread from "./Thread"
 
 //Libraries
 import { getThreads } from "../firebase"
-import { useRecoilState } from "recoil"
+import { useRecoilState, useRecoilValue } from "recoil"
 import { ThreadTitlesAtom } from "../atoms/ThreadTitlesAtom"
+import { RecoilUNIXTime } from "../atoms/UNXITimeAtom"
+
+//Useful Functions
+import { timeAgo } from "../functions"
 
 const BBS = () => {
-	const [threadTitles, setThreadTitles] = useRecoilState(ThreadTitlesAtom)
+	const UNIXTime = useRecoilValue(RecoilUNIXTime)
+	const [threads, setThreads] = useRecoilState(ThreadTitlesAtom)
 	const [openedID, setOpenedID] = useState("") //スレッドリストから開かれたスレッドのID
 
 	useEffect(() => {
 		(async() => {
 			const res = await getThreads(0)
-			setThreadTitles(res)
+			setThreads(res)
 		})()
 	}, [])
 
@@ -50,10 +55,10 @@ const BBS = () => {
 	return(
 		<Box mx={2} overflowX="hidden">
 			<VStack className={listClasses} style={displayFlag ? {display: "none"} : {}} align="stretch" divider={<StackDivider borderColor="gray.200"/>} overflowY="auto" maxH={{base: 400, md:460, lg: 500}}>
-				{threadTitles.map((v, k) => {
+				{threads.map((v, k) => {
 					return(
-						<Box key={k} onClick={() => { openThread(v[1]); setOpenedID(v[0]) }}>
-							<ListHeading title={v[1]} lastUpdate="1分以内"/> {/*1分以内、○分前、○時間前、○日前、○ヶ月前、1年以上前*/}
+						<Box key={k} onClick={() => { openThread(v.title); setOpenedID(v.id) }}>
+							<ListHeading title={v.title} lastUpdate={timeAgo(v.lastUpdate, UNIXTime)} /> {/*1分以内、○分前、○時間前、○日前、○ヶ月前、1年以上前*/}
 						</Box>
 					)
 				})}

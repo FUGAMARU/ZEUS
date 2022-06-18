@@ -1,3 +1,5 @@
+import moment from "moment"
+
 const getTimestamp = (unixTime: number) => {
 	const datetime = new Date(unixTime * 1000)
 	const hour = datetime.getHours().toString()
@@ -108,11 +110,33 @@ const getRemainingTime = (unixTime: number, target: string) => {
 }
 
 const escapeHTML = (str: string) => {
-    return str.replace(/&/g, '&lt;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
+    return str.replace(/&/g, "&lt;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
     .replace(/'/g, "&#x27;")
 }
 
-export { getTimestamp, whattimeIsIt, getRemainingTime, escapeHTML }
+const timeAgo = (from: number, to: number) => {
+	const diff = to - from
+	const momentFrom = moment(from * 1000)
+	const momentTo = moment(to * 1000)
+
+	if(diff <= 60){
+		return "1分以内"
+	}else if(diff <= 3600){
+		return `${Math.abs(momentFrom.diff(momentTo, "minutes"))}分前`
+	}else if(diff <= 86400){
+		return `${Math.abs(momentFrom.diff(momentTo, "hours"))}時間前`
+	}else if(diff <= 604800){
+		return `${Math.abs(momentFrom.diff(momentTo, "days"))}日前`
+	}else if(diff <= 2592000){
+		return `${Math.abs(momentFrom.diff(momentTo, "weeks"))}週間前`
+	}else if(diff <= 31536000){
+		return `${Math.abs(momentFrom.diff(momentTo, "months"))}ヶ月前`
+	}else{
+		return `${Math.abs(momentFrom.diff(momentTo, "years"))}年前`
+	}
+}
+
+export { getTimestamp, whattimeIsIt, getRemainingTime, escapeHTML, timeAgo }

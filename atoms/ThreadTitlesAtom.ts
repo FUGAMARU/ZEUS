@@ -1,6 +1,12 @@
 import { atom } from "recoil"
 
-export const ThreadTitlesAtom = atom<string[][]>({
+interface Threads {
+	id: string,
+	title: string,
+	lastUpdate: number
+}
+
+export const ThreadTitlesAtom = atom<Threads[]>({
 	key: "Threads",
 	default: []
 })

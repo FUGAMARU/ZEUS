@@ -121,6 +121,12 @@ interface Thread {
 	title: string
 }
 
+interface Threads {
+	id: string,
+	title: string,
+	lastUpdate: number
+}
+
 const getLectureData = (target: string, uid: string, UNIXTime: number): Promise<any> => { //return => object, ""(授業未開講時)
 	return new Promise(async (resolve) => {
 		const dayOfWeekStr = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"][new Date(UNIXTime * 1000).getDay()]
@@ -185,25 +191,35 @@ const getClassName = (uid: string): Promise<string> => {
 	})
 }
 
-const getThreads = (startUNIXTime: number): Promise<string[][]> => {
+const getThreads = (startUNIXTime: number): Promise<Threads[]> => {
 	return new Promise (async (resolve) => {
-		let titles: string[][] = []
+		let threads: Threads[] = []
 		if(startUNIXTime === 0){
 			const querySnapshot = await getDocs(query(collection(db, "threads"), orderBy("createdAt", "desc"), limit(20)))
 			querySnapshot.forEach((doc) => {
-				titles.push([doc.id, doc.data().title])
+				const data = doc.data() as Thread
+				threads.push({
+					id: doc.id,
+					title: data.title,
+					lastUpdate: data.lastUpdate
+				})	
 			})
 		}else{
 			const querySnapshot = await getDocs(query(collection(db, "threads"), orderBy("createdAt", "desc"), startAt(startUNIXTime), limit(20)))
 			querySnapshot.forEach((doc) => {
-				titles.push([doc.id, doc.data().title])
+				const data = doc.data() as Thread
+				threads.push({
+					id: doc.id,
+					title: data.title,
+					lastUpdate: data.lastUpdate
+				})	
 			})
 		}
-		resolve(titles)
+		resolve(threads)
 	})
 }
 
-const createBBSThread = (uid: string, title: string, UNIXTime: number): Promise<string[]> => {
+const createBBSThread = (uid: string, title: string, UNIXTime: number): Promise<Threads> => {
 	return new Promise(async (resolve) => {
 		const threadsRef = collection(db, "threads")
 		const newRef = await addDoc(threadsRef, {
@@ -213,7 +229,11 @@ const createBBSThread = (uid: string, title: string, UNIXTime: number): Promise<
 			lastUpdate: UNIXTime,
 			responses: []
 		} as Thread)
-		resolve([newRef.id, title])
+		resolve({
+			id: newRef.id,
+			title: title,
+			lastUpdate: UNIXTime
+		})
 	})
 }
 
