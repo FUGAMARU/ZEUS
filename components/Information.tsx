@@ -149,10 +149,10 @@ const Information = () => {
 			<Modal isOpen={isOpen} onClose={onClose} size="xl">
 				<ModalOverlay />
 				<ModalContent>
-					<ModalHeader>{modalHeader}</ModalHeader>
+					<ModalHeader><Text className="kb">{modalHeader}</Text></ModalHeader>
 					<ModalCloseButton />
 					<ModalBody>
-						<Text whiteSpace="pre-line">{modalBody}</Text>
+						<Text className="kr" whiteSpace="pre-line">{modalBody}</Text>
 					</ModalBody>
 				</ModalContent>
 			</Modal>

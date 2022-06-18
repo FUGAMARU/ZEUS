@@ -11,6 +11,9 @@ import ChatBalloon from "./ChatBalloon"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons"
 
+//Useful Functions
+import { escapeHTML } from "../functions"
+
 //Contexts
 import { SocketContext } from "../contexts/SocketIO"
 
@@ -85,23 +88,26 @@ const Chat = () => {
 	socket.on("connect", () => { if(socket.id) socket.emit("register", userdata.classID) })
 
 	const sendMessage = () => {
-		if(chatScope){
-			socket.emit("sendMessage", {
-				scope: "class",
-				classID: userdata.classID,
-				userName: userdata.name,
-				iconSrc: userdata.iconUrl,
-				message: message
-			})
-		}else{
-			socket.emit("sendMessage", {
-				scope: "global",
-				userName: userdata.name,
-				iconSrc: userdata.iconUrl,
-				message: message
-			})
+		if(message !== ""){
+			const escapedString = escapeHTML(message)
+			if(chatScope){
+				socket.emit("sendMessage", {
+					scope: "class",
+					classID: userdata.classID,
+					userName: userdata.name,
+					iconSrc: userdata.iconUrl,
+					message: escapedString
+				})
+			}else{
+				socket.emit("sendMessage", {
+					scope: "global",
+					userName: userdata.name,
+					iconSrc: userdata.iconUrl,
+					message: escapedString
+				})
+			}
+			setMessage("")
 		}
-		setMessage("")
 	}
 
 	return(

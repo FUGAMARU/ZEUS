@@ -19,6 +19,9 @@ import Cropper from "react-cropper"
 import "cropperjs/dist/cropper.css"
 import imageCompression from "browser-image-compression"
 
+//Useful Functions
+import { escapeHTML } from "../functions"
+
 //Settings
 import { auth, registerUserInformation, checkUserDataExists } from "../firebase"
 
@@ -124,18 +127,22 @@ const Register: NextPage = () => {
 	}
 
 	const register = async () => {
-		const data = {
-			name: `${secondName.current?.value} ${firstName.current?.value}`,
-			class: `${campus}-${selectedClass}`
-		}
-		if(userIconFlag){
-			const img = await imageCompression.getFilefromDataUrl(cropData, "icon")
-			const compressedFile = await imageCompression(img, {maxSizeMB: 0.3, maxWidthOrHeight: 512}); //Blob
-			await registerUserInformation(UID, accountType, data, compressedFile)
-			Router.push("/")
-		}else{
-			await registerUserInformation(UID, accountType, data, null)
-			Router.push("/")
+		if(secondName.current?.value && firstName.current?.value){
+			const escapedSecondName = escapeHTML(secondName.current.value)
+			const escapedFirstName = escapeHTML(firstName.current.value)
+			const data = {
+				name: `${escapedSecondName} ${escapedFirstName}`,
+				class: `${campus}-${selectedClass}`
+			}
+			if(userIconFlag){
+				const img = await imageCompression.getFilefromDataUrl(cropData, "icon")
+				const compressedFile = await imageCompression(img, {maxSizeMB: 0.3, maxWidthOrHeight: 512}); //Blob
+				await registerUserInformation(UID, accountType, data, compressedFile)
+				Router.push("/")
+			}else{
+				await registerUserInformation(UID, accountType, data, null)
+				Router.push("/")
+			}
 		}
 	}
 
@@ -145,7 +152,7 @@ const Register: NextPage = () => {
 				<Modal isOpen={isOpen} onClose={() => {setUserIconPreview("/anonymous.png");onClose()}} size="xl">
 					<ModalOverlay />
 					<ModalContent>
-						<ModalHeader>クロップ</ModalHeader>
+						<ModalHeader><Text className="kb">クロップ</Text></ModalHeader>
 						<ModalCloseButton />
 						<ModalBody>
 							<Cropper

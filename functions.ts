@@ -107,4 +107,12 @@ const getRemainingTime = (unixTime: number, target: string) => {
 	}
 }
 
-export { getTimestamp, whattimeIsIt, getRemainingTime }
+const escapeHTML = (str: string) => {
+    return str.replace(/&/g, '&lt;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, "&#x27;")
+}
+
+export { getTimestamp, whattimeIsIt, getRemainingTime, escapeHTML }
