@@ -1,6 +1,6 @@
 import { getApps, initializeApp } from "firebase/app"
 //import { getAnalytics } from "firebase/analytics"
-import { getAuth } from "firebase/auth"
+import { getAuth, User } from "firebase/auth"
 import { GoogleAuthProvider } from "firebase/auth"
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
 import { doc, getDoc, getFirestore, setDoc, collection, addDoc, getDocs, query, orderBy, limit, startAt } from "firebase/firestore"
@@ -79,15 +79,23 @@ const registerUserInformation = (uid: string, accountType: string, userData: Use
 	})
 }
 
-const getUserData = (uid: string): Promise<any> => {
+interface Userdata {
+	class: string,
+	iconSrc: string,
+	message: string,
+	name: string,
+	snsLinks: []
+}
+
+const getUserData = (uid: string): Promise<Userdata> => {
 	return new Promise(async (resolve) => {
 		const studentsDoc = await getDoc(doc(db, "students", uid))
 		const teachersDoc = await getDoc(doc(db, "teachers", uid))
 
 		if(studentsDoc.exists()){
-			resolve(studentsDoc.data())
+			resolve(studentsDoc.data() as Userdata)
 		}else if(teachersDoc.exists()){
-			resolve(teachersDoc.data())
+			resolve(teachersDoc.data() as Userdata)
 		}
 	})
 }
@@ -197,17 +205,6 @@ const getThreads = (startUNIXTime: number): Promise<string[][]> => {
 
 const createBBSThread = (uid: string, title: string, UNIXTime: number): Promise<string[]> => {
 	return new Promise(async (resolve) => {
-		/*for(let i=0; i < 10; i++){
-			const colRef = collection(db, "threads")
-			await addDoc(colRef, {
-				createdAt: UNIXTime,
-				createdBy: uid,
-				lastUpdate: UNIXTime,
-				responses: [],
-				title: `テストスレッド${i + 1}`
-			})
-		}*/
-		
 		const threadsRef = collection(db, "threads")
 		const newRef = await addDoc(threadsRef, {
 			title: title,
@@ -220,4 +217,12 @@ const createBBSThread = (uid: string, title: string, UNIXTime: number): Promise<
 	})
 }
 
-export { auth, provider, checkUserDataExists, registerUserInformation, getUserData, getLectureData, getClassName, getThreads, createBBSThread }
+const getResponses = (id: string): Promise<any> => {
+	return new Promise(async (resolve) => {
+		const threadRef = await getDoc(doc(db, "threads", id))
+		const threadData = threadRef.data() as Thread
+		resolve(threadData.responses)
+	})
+}
+
+export { auth, provider, checkUserDataExists, registerUserInformation, getUserData, getLectureData, getClassName, getThreads, createBBSThread, getResponses }
