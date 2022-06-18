@@ -115,49 +115,52 @@ interface Thread {
 
 const getLectureData = (target: string, uid: string, UNIXTime: number): Promise<any> => { //return => object, ""(授業未開講時)
 	return new Promise(async (resolve) => {
-		const hour = whattimeIsIt(UNIXTime, target) //今が何時限目なのか
-		//UIDから所属クラスを特定
-		const studentDoc = await getDoc(doc(db, "students", uid))
-		const studentData = studentDoc.data()
-		const classId: string = studentData?.class
-
-		//クラスIDと現在の時間から授業IDを特定
 		const dayOfWeekStr = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"][new Date(UNIXTime * 1000).getDay()]
-		const classDoc = await getDoc(doc(db, "classes", classId))
-		const classData = classDoc.data()
+		if(dayOfWeekStr !== "sun" && dayOfWeekStr !== "sat"){ //土日に開講している授業は無い
+			const hour = whattimeIsIt(UNIXTime, target) //今が何時限目なのか
+			//UIDから所属クラスを特定
+			const studentDoc = await getDoc(doc(db, "students", uid))
+			const studentData = studentDoc.data()
+			const classId: string = studentData?.class
 
-		if(target === "current"){
-			if(hour !== -1 && hour !== 0){
-				if(classData){
-					const lectureID: string|null = classData["lectures"][dayOfWeekStr][hour - 1]
-					if(lectureID === null){
-						resolve("")
-					}else{
-						//授業IDから授業情報を取得
-						const lectureDoc = await getDoc(doc(db, "lectures", lectureID))
-						resolve(lectureDoc.data())
+			//クラスIDと現在の時間から授業IDを特定
+			const classDoc = await getDoc(doc(db, "classes", classId))
+			const classData = classDoc.data()
+
+			if(target === "current"){
+				if(hour !== -1 && hour !== 0){
+					if(classData){
+						const lectureID: string|null = classData["lectures"][dayOfWeekStr][hour - 1]
+						if(lectureID === null){
+							resolve("")
+						}else{
+							//授業IDから授業情報を取得
+							const lectureDoc = await getDoc(doc(db, "lectures", lectureID))
+							resolve(lectureDoc.data())
+						}
 					}
+				}else{
+					resolve("")
 				}
-			}else{
-				resolve("")
-			}
-		}else if(target === "next"){
-			if(hour !== -1 && hour !== 8){ //8時間目の次はない
-				if(classData){
-					const lectureID: string|null = classData["lectures"][dayOfWeekStr][hour]
-					if(lectureID === null){
-						resolve("")
-					}else{
-						//授業IDから授業情報を取得
-						const lectureDoc = await getDoc(doc(db, "lectures", lectureID))
-						resolve(lectureDoc.data())
+			}else if(target === "next"){
+				if(hour !== -1 && hour !== 8){ //8時間目の次はない
+					if(classData){
+						const lectureID: string|null = classData["lectures"][dayOfWeekStr][hour]
+						if(lectureID === null){
+							resolve("")
+						}else{
+							//授業IDから授業情報を取得
+							const lectureDoc = await getDoc(doc(db, "lectures", lectureID))
+							resolve(lectureDoc.data())
+						}
 					}
+				}else{
+					resolve("")
 				}
-			}else{
-				resolve("")
 			}
+		}else{
+			resolve("")
 		}
-		
 	})
 }
 
