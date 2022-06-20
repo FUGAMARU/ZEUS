@@ -14,46 +14,34 @@ import moment from "moment"
 import { useRecoilValue } from "recoil"
 import { UserdataAtom } from "../atoms/UserdataAtom"
 
+//Interfaces
+import { Res, Responses } from "../Interfaces"
+
 interface Props {
 	title: string,
 	backToList: VoidFunction,
 	id: string
 }
 
-interface MinifiedThread {
-	uid: string,
-	sentAt: number,
-	text: string
-}
-
-interface Response {
-	sentAt: number,
-	text: string,
-	userdata: {
-		name: string,
-		iconUrl: string
-	}
-}
-
 const Thread = (props: Props) => {
 	const userdata = useRecoilValue(UserdataAtom)
-	const [responses, setResponses] = useState<Response[]>([])
+	const [responses, setResponses] = useState<Res[]>([])
 	const [isLoading, setLoading] = useState(true) //BBSのレス一覧の読み込みが完了したか
 
 	useEffect(() => {
 		(async () => {
 			if(props.id){
 				setLoading(true)
-				const res: MinifiedThread[] = await getResponses(props.id)
-				let tmpResponses: Response[] = []
-				res.forEach(async (v: MinifiedThread) => {
+				const res: Responses[] = await getResponses(props.id)
+				let tmpResponses: Res[] = []
+				res.forEach(async (v: Responses) => {
 					const res2 = await getUserData(userdata.uid)
 					tmpResponses.push({
-						sentAt: v.sentAt,
-						text: v.text,
+						sentAt: v.sentAt as number,
+						text: v.text as string,
 						userdata: {
 							name: res2.name,
-							iconUrl: res2.iconSrc
+							iconUrl: res2.iconSrc as string
 						}
 					})
 				})

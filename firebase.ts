@@ -5,6 +5,7 @@ import { GoogleAuthProvider } from "firebase/auth"
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
 import { doc, getDoc, getFirestore, setDoc, collection, addDoc, getDocs, query, orderBy, limit, startAt } from "firebase/firestore"
 import { whattimeIsIt } from "./functions"
+import { Threads, Responses, ThreadHeadings, Class, Lecture, FSUserdata } from "./Interfaces"
 
 let app
 if(getApps().length < 1){
@@ -40,15 +41,7 @@ const checkUserDataExists = async (uid: string) => {
 	}
 }
 
-interface UserData {
-	name: string,
-	class: string,
-	iconSrc?: string,
-	message?: string,
-	snsLinks?: string[]
-}
-
-const registerUserInformation = (uid: string, accountType: string, userData: UserData, userIcon: any) => {
+const registerUserInformation = (uid: string, accountType: string, userData: FSUserdata, userIcon: any) => {
 	const docRef = accountType === "student" ? doc(db, "students", uid) : doc(db, "teachers", uid)
 
 	return new Promise(async (resolve, reject) => {
@@ -79,55 +72,20 @@ const registerUserInformation = (uid: string, accountType: string, userData: Use
 	})
 }
 
-interface Userdata {
-	class: string,
-	iconSrc: string,
-	message: string,
-	name: string,
-	snsLinks: []
-}
-
-const getUserData = (uid: string): Promise<Userdata> => {
+const getUserData = (uid: string): Promise<FSUserdata> => {
 	return new Promise(async (resolve) => {
 		const studentsDoc = await getDoc(doc(db, "students", uid))
 		const teachersDoc = await getDoc(doc(db, "teachers", uid))
 
 		if(studentsDoc.exists()){
-			resolve(studentsDoc.data() as Userdata)
+			resolve(studentsDoc.data() as FSUserdata)
 		}else if(teachersDoc.exists()){
-			resolve(teachersDoc.data() as Userdata)
+			resolve(teachersDoc.data() as FSUserdata)
 		}
 	})
 }
 
-interface ObjectTypes {
-	name: string,
-	hours: string,
-	location: string,
-	teacher: string,
-	classroom: string,
-	zoom: string
-}
-
-interface Thread {
-	createdAt: number,
-	createdBy: string,
-	lastUpdate: number,
-	responses: {
-		uid?: string,
-		sentAt?: number,
-		text?: string
-	}[],
-	title: string
-}
-
-interface Threads {
-	id: string,
-	title: string,
-	lastUpdate: number
-}
-
-const getLectureData = (target: string, uid: string, UNIXTime: number): Promise<any> => { //return => object, ""(授業未開講時)
+const getLectureData = (target: string, uid: string, UNIXTime: number): Promise<Lecture | string> => { //return => object, ""(授業未開講時)
 	return new Promise(async (resolve) => {
 		const dayOfWeekStr = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"][new Date(UNIXTime * 1000).getDay()]
 		if(dayOfWeekStr !== "sun" && dayOfWeekStr !== "sat"){ //土日に開講している授業は無い
@@ -150,7 +108,7 @@ const getLectureData = (target: string, uid: string, UNIXTime: number): Promise<
 						}else{
 							//授業IDから授業情報を取得
 							const lectureDoc = await getDoc(doc(db, "lectures", lectureID))
-							resolve(lectureDoc.data())
+							resolve(lectureDoc.data() as Lecture)
 						}
 					}
 				}else{
@@ -165,7 +123,7 @@ const getLectureData = (target: string, uid: string, UNIXTime: number): Promise<
 						}else{
 							//授業IDから授業情報を取得
 							const lectureDoc = await getDoc(doc(db, "lectures", lectureID))
-							resolve(lectureDoc.data())
+							resolve(lectureDoc.data() as Lecture)
 						}
 					}
 				}else{
@@ -191,13 +149,13 @@ const getClassName = (uid: string): Promise<string> => {
 	})
 }
 
-const getThreads = (startUNIXTime: number): Promise<Threads[]> => {
+const getThreads = (startUNIXTime: number): Promise<ThreadHeadings[]> => {
 	return new Promise (async (resolve) => {
-		let threads: Threads[] = []
+		let threads: ThreadHeadings[] = []
 		if(startUNIXTime === 0){
 			const querySnapshot = await getDocs(query(collection(db, "threads"), orderBy("createdAt", "desc"), limit(20)))
 			querySnapshot.forEach((doc) => {
-				const data = doc.data() as Thread
+				const data = doc.data()
 				threads.push({
 					id: doc.id,
 					title: data.title,
@@ -207,7 +165,7 @@ const getThreads = (startUNIXTime: number): Promise<Threads[]> => {
 		}else{
 			const querySnapshot = await getDocs(query(collection(db, "threads"), orderBy("createdAt", "desc"), startAt(startUNIXTime), limit(20)))
 			querySnapshot.forEach((doc) => {
-				const data = doc.data() as Thread
+				const data = doc.data()
 				threads.push({
 					id: doc.id,
 					title: data.title,
@@ -219,7 +177,7 @@ const getThreads = (startUNIXTime: number): Promise<Threads[]> => {
 	})
 }
 
-const createBBSThread = (uid: string, title: string, UNIXTime: number): Promise<Threads> => {
+const createBBSThread = (uid: string, title: string, UNIXTime: number): Promise<ThreadHeadings> => {
 	return new Promise(async (resolve) => {
 		const threadsRef = collection(db, "threads")
 		const newRef = await addDoc(threadsRef, {
@@ -228,7 +186,7 @@ const createBBSThread = (uid: string, title: string, UNIXTime: number): Promise<
 			createdBy: uid,
 			lastUpdate: UNIXTime,
 			responses: []
-		} as Thread)
+		} as Threads)
 		resolve({
 			id: newRef.id,
 			title: title,
@@ -237,10 +195,10 @@ const createBBSThread = (uid: string, title: string, UNIXTime: number): Promise<
 	})
 }
 
-const getResponses = (id: string): Promise<any> => {
+const getResponses = (id: string): Promise<Responses[]> => {
 	return new Promise(async (resolve) => {
 		const threadRef = await getDoc(doc(db, "threads", id))
-		const threadData = threadRef.data() as Thread
+		const threadData = threadRef.data() as Threads
 		resolve(threadData.responses)
 	})
 }

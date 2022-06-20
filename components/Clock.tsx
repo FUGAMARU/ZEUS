@@ -12,17 +12,11 @@ import useSWR from "swr"
 import useSWRImmutable from "swr/immutable"
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
+//Interfaces
+import { TwitterTrends } from "../Interfaces"
+
 interface Props {
 	UNIXTime: number
-}
-
-interface TwitterTrends {
-	trends: {
-		name: string,
-		url: string,
-		tweet_volume: number
-	}[],
-	lastUpdate: string
 }
 
 const Clock = (props: Props) => {

@@ -12,7 +12,7 @@ import { createBBSThread } from "../firebase"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPlus } from "@fortawesome/free-solid-svg-icons"
 import { RecoilUNIXTime } from "../atoms/UNXITimeAtom"
-import { ThreadTitlesAtom } from "../atoms/ThreadTitlesAtom"
+import { ThreadHeadingsAtom } from "../atoms/ThreadHeadingsAtom"
 
 //Useful Functions
 import { escapeHTML } from "../functions"
@@ -26,7 +26,7 @@ const BBSPopover = () => {
     const isTouchDevice = useTouchDevice()
     const inputRef = useRef<HTMLInputElement>(null)
 	const recoilUNIXTime = useRecoilValue(RecoilUNIXTime)
-	const [threadTitles, pushThreadTitles] = useRecoilState(ThreadTitlesAtom)
+	const [threadTitles, pushThreadTitles] = useRecoilState(ThreadHeadingsAtom)
 	const [isOpen, setOpen] = useState<boolean>() //Popoverが開いているかどうか
 	const { isOpen: isOpenModal, onOpen: onOpenModal, onClose: onCloseModal } = useDisclosure() //モーダルが開いているかどうか
 

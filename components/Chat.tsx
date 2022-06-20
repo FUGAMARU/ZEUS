@@ -21,14 +21,8 @@ import { SocketContext } from "../contexts/SocketIO"
 import { useRecoilValue } from "recoil"
 import { UserdataAtom } from "../atoms/UserdataAtom"
 
-interface MessageObject{
-	scope?: string
-	type: string
-	userName?: string,
-	iconSrc?: string
-	datetime: string,
-	message: string
-}
+//Interfaces
+import { MessageObject } from "../Interfaces"
 
 const Chat = () => {
 	const userdata = useRecoilValue(UserdataAtom)

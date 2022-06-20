@@ -11,7 +11,7 @@ import Thread from "./Thread"
 //Libraries
 import { getThreads } from "../firebase"
 import { useRecoilState, useRecoilValue } from "recoil"
-import { ThreadTitlesAtom } from "../atoms/ThreadTitlesAtom"
+import { ThreadHeadingsAtom } from "../atoms/ThreadHeadingsAtom"
 import { RecoilUNIXTime } from "../atoms/UNXITimeAtom"
 
 //Useful Functions
@@ -19,7 +19,7 @@ import { timeAgo } from "../functions"
 
 const BBS = () => {
 	const UNIXTime = useRecoilValue(RecoilUNIXTime)
-	const [threads, setThreads] = useRecoilState(ThreadTitlesAtom)
+	const [threads, setThreads] = useRecoilState(ThreadHeadingsAtom)
 	const [openedID, setOpenedID] = useState("") //スレッドリストから開かれたスレッドのID
 
 	useEffect(() => {

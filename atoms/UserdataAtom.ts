@@ -1,12 +1,5 @@
 import { atom } from "recoil"
-
-interface Userdata {
-	uid: string,
-	name: string,
-	iconUrl: string,
-	classID: string,
-	className: string
-}
+import { Userdata } from "../Interfaces"
 
 export const UserdataAtom = atom<Userdata>({
 	key: "Userdata",
