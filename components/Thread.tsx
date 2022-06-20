@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react"
 
 //Chakra UI Components
-import { Box, Flex, Text, VStack, Avatar, StackDivider, Textarea, Button, Tooltip } from "@chakra-ui/react"
+import { Box, Flex, Text, VStack, Avatar, StackDivider, Textarea, Button, Tooltip, Spinner } from "@chakra-ui/react"
 
 //Libraries
 import { getResponses, getUserData } from "../firebase"
@@ -38,10 +38,12 @@ interface Response {
 const Thread = (props: Props) => {
 	const userdata = useRecoilValue(UserdataAtom)
 	const [responses, setResponses] = useState<Response[]>([])
+	const [isLoading, setLoading] = useState(true) //BBSのレス一覧の読み込みが完了したか
 
 	useEffect(() => {
 		(async () => {
 			if(props.id){
+				setLoading(true)
 				const res: MinifiedThread[] = await getResponses(props.id)
 				let tmpResponses: Response[] = []
 				res.forEach(async (v: MinifiedThread) => {
@@ -56,6 +58,7 @@ const Thread = (props: Props) => {
 					})
 				})
 				setResponses(tmpResponses)
+				setLoading(false)
 			}
 		})()
 	}, [props.id])
@@ -71,7 +74,13 @@ const Thread = (props: Props) => {
 			</Flex>
 
 			<VStack bg="#efefef" h={{base: 350, md:314, lg: 350}} overflowY="auto" px={4} py={3} align="stretch" divider={<StackDivider borderColor="gray.200"/>} position="relative">
-				{responses.map((v, k) => {
+				{isLoading ?
+					<Box textAlign="center">
+						<Spinner size="sm" />
+						<Text className="kr" fontSize="0.8rem">レスを取得中…</Text>
+					</Box>
+				:
+				responses.map((v, k) => {
 					return(
 						<Box key={k}>
 							<Flex>
@@ -83,9 +92,8 @@ const Thread = (props: Props) => {
 							</Flex>
 						</Box>
 					)
-					})}
+				})}
 			</VStack>
-
 			<Box>
 				<Textarea placeholder="テキストを入力…" size="xs" />
 				<Button size="xs" w="100%">送信する</Button>
