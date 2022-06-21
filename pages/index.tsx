@@ -56,7 +56,7 @@ const Index: NextPage = () => {
 						setUserdata({
 							uid: user.uid,
 							name: res.name,
-							iconUrl: res.iconSrc,
+							iconUrl: res.iconSrc as string,
 							classID: res.class,
 							className: await getClassName(user.uid)
 						})

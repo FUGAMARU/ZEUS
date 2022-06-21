@@ -73,7 +73,7 @@ const NextClass = (props: Props) => {
 		const res = await getLectureData("next", userdata.uid, props.UNIXTime)
 		console.log("==========次の授業情報==========")
 		console.log(res)
-		if(res === ""){
+		if(typeof res === "string"){
 			setLectureData({
 				name: "次の授業はありません",
 				hours: "ㅤㅤㅤㅤㅤㅤㅤ",

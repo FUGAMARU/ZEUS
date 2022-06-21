@@ -25,13 +25,14 @@ interface Props {
 
 const Thread = (props: Props) => {
 	const userdata = useRecoilValue(UserdataAtom)
-	const [responses, setResponses] = useState<Res[]>([])
+	const [responses, setResponses] = useState<Res[] | null>(null)
 	const [isLoading, setLoading] = useState(true) //BBSのレス一覧の読み込みが完了したか
 
 	useEffect(() => {
 		(async () => {
 			if(props.id){
 				setLoading(true)
+				setResponses(null)
 				const res: Responses[] = await getResponses(props.id)
 				let tmpResponses: Res[] = []
 				res.forEach(async (v: Responses) => {
@@ -67,8 +68,7 @@ const Thread = (props: Props) => {
 						<Spinner size="sm" />
 						<Text className="kr" fontSize="0.8rem">レスを取得中…</Text>
 					</Box>
-				:
-				responses.map((v, k) => {
+				: responses?.length ? responses.map((v, k) => {
 					return(
 						<Box key={k}>
 							<Flex>
@@ -80,7 +80,8 @@ const Thread = (props: Props) => {
 							</Flex>
 						</Box>
 					)
-				})}
+				})
+				: <Text className="kr" fontSize="0.8rem" align="center">このスレッドには書き込みがありません</Text>}
 			</VStack>
 			<Box>
 				<Textarea placeholder="テキストを入力…" size="xs" />
