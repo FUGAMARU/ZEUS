@@ -104,7 +104,9 @@ const Register: NextPage = () => {
 
 	const getCropData = () => {
 		if(typeof cropper !== "undefined")	{
-			setCropData(cropper.getCroppedCanvas().toDataURL())
+			const cropData = cropper.getCroppedCanvas().toDataURL()
+			setCropData(cropData)
+			setUserIconPreview(cropData)
 		}
 	}
 
@@ -146,6 +148,15 @@ const Register: NextPage = () => {
 		}
 	}
 
+	const handleCrop = () => {
+		if(inputRef.current?.value){
+			inputRef.current.value = ""
+		}
+		getCropData()
+		onClose()
+		setUserIconFlag(true)
+	}
+
 	if(displayState){
 		return(
 			<>
@@ -174,7 +185,7 @@ const Register: NextPage = () => {
 							/>
 						</ModalBody>
 						<ModalFooter>
-							<Button colorScheme="blue" mr={3} onClick={() => {getCropData();onClose();setUserIconFlag(true)}}>切り抜く</Button>
+							<Button colorScheme="blue" mr={3} onClick={handleCrop}>切り抜く</Button>
 						</ModalFooter>
 					</ModalContent>
 				</Modal>
@@ -189,7 +200,7 @@ const Register: NextPage = () => {
 								<Avatar src={userIconPreview} size="xl" cursor="pointer" onClick={customUploadFunction}></Avatar>
 								<input ref={inputRef} type="file" accept="image/jpeg, image/png" onChange={onChange} style={{display: "none"}} />
 							</Center>
-							<Text className="kr" textAlign="center" fontSize="0.7rem" mt={2}>クリックしてアイコンをアップロード</Text>
+							<Text className="kr" textAlign="center" fontSize="0.7rem" mt={2} onClick={customUploadFunction} cursor="pointer">クリックしてアイコンをアップロード</Text>
 							<Flex justifyContent="space-around" mt={3}>
 								<Input ref={secondName} textAlign="center" variant="flushed" w="6rem" focusBorderColor="#10c9c3" placeholder="姓"></Input>
 								<Input ref={firstName} textAlign="center" variant="flushed" w="6rem" focusBorderColor="#10c9c3" placeholder="名"></Input>
