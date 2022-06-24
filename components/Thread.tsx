@@ -36,7 +36,7 @@ const Thread = (props: Props) => {
 				const res: Responses[] = await getResponses(props.id)
 				let tmpResponses: Res[] = []
 				res.forEach(async (v: Responses) => {
-					const res2 = await getUserData(userdata.uid)
+					const res2 = await getUserData(v.uid)
 					tmpResponses.push({
 						sentAt: v.sentAt as number,
 						text: v.text as string,
