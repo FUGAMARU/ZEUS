@@ -1,11 +1,11 @@
 import { getApps, initializeApp } from "firebase/app"
 //import { getAnalytics } from "firebase/analytics"
-import { getAuth, User } from "firebase/auth"
+import { getAuth } from "firebase/auth"
 import { GoogleAuthProvider } from "firebase/auth"
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
-import { doc, getDoc, getFirestore, setDoc, collection, addDoc, getDocs, query, orderBy, limit, startAt } from "firebase/firestore"
+import { doc, getDoc, getFirestore, setDoc, collection, addDoc, getDocs, query, orderBy, limit, startAt, updateDoc, arrayUnion } from "firebase/firestore"
 import { whattimeIsIt } from "./functions"
-import { Threads, Responses, ThreadHeadings, Class, Lecture, FSUserdata } from "./Interfaces"
+import { Threads, Responses, ThreadHeadings, Lecture, FSUserdata, Res } from "./Interfaces"
 
 let app
 if(getApps().length < 1){
@@ -203,4 +203,26 @@ const getResponses = (id: string): Promise<Responses[]> => {
 	})
 }
 
-export { auth, provider, checkUserDataExists, registerUserInformation, getUserData, getLectureData, getClassName, getThreads, createBBSThread, getResponses }
+const postRes = (id: string, uid: string, UNIXTime: number, text: string): Promise<Res> => {
+	return new Promise(async (resolve) => {
+		const threadRef = doc(db, "threads", id)
+		await updateDoc(threadRef, {
+			responses: arrayUnion({
+				uid: uid,
+				sentAt: UNIXTime,
+				text: text
+			} as Responses)
+		})
+		const userdata = await getUserData(uid)
+		resolve({
+			sentAt: UNIXTime,
+			text: text,
+			userdata: {
+				name: userdata.name,
+				iconUrl: userdata.iconSrc
+			}
+		} as Res)
+	})
+}
+
+export { auth, provider, checkUserDataExists, registerUserInformation, getUserData, getLectureData, getClassName, getThreads, createBBSThread, getResponses, postRes }

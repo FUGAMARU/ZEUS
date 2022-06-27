@@ -1,11 +1,11 @@
 //React Hooks
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 
 //Chakra UI Components
 import { Box, Flex, Text, VStack, Avatar, StackDivider, Textarea, Button, Tooltip, Spinner } from "@chakra-ui/react"
 
 //Libraries
-import { getResponses, getUserData } from "../firebase"
+import { getResponses, getUserData, postRes } from "../firebase"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faAngleLeft, faArrowRotateRight } from "@fortawesome/free-solid-svg-icons"
 import moment from "moment"
@@ -13,6 +13,7 @@ import moment from "moment"
 //Global State Management
 import { useRecoilValue } from "recoil"
 import { UserdataAtom } from "../atoms/UserdataAtom"
+import { RecoilUNIXTime } from "../atoms/UNXITimeAtom"
 
 //Interfaces
 import { Res, Responses } from "../Interfaces"
@@ -25,6 +26,8 @@ interface Props {
 
 const Thread = (props: Props) => {
 	const userdata = useRecoilValue(UserdataAtom)
+	const UNIXTime = useRecoilValue(RecoilUNIXTime)
+	const textAreaRef = useRef<HTMLTextAreaElement>(null)
 	const [responses, setResponses] = useState<Res[] | null>(null)
 	const [isLoading, setLoading] = useState(true) //BBSのレス一覧の読み込みが完了したか
 
@@ -51,6 +54,18 @@ const Thread = (props: Props) => {
 			}
 		})()
 	}, [props.id])
+
+	const postResponse = async () => {
+		if(textAreaRef.current?.value){
+			const res = await postRes(props.id, userdata.uid, UNIXTime, textAreaRef.current.value)
+			setResponses([...responses as Res[], {
+				sentAt: res.sentAt,
+				text: res.text,
+				userdata: res.userdata
+			}])
+			textAreaRef.current.value = ""
+		}
+	}
 
 	return(
 		<Box>
@@ -84,8 +99,8 @@ const Thread = (props: Props) => {
 				: <Text className="kr" fontSize="0.8rem" align="center">このスレッドには書き込みがありません</Text>}
 			</VStack>
 			<Box>
-				<Textarea placeholder="テキストを入力…" size="xs" />
-				<Button size="xs" w="100%">送信する</Button>
+				<Textarea placeholder="テキストを入力…" size="xs" ref={textAreaRef} />
+				<Button size="xs" w="100%" onClick={postResponse}>送信する</Button>
 			</Box>
 		</Box>
 	)
