@@ -1,7 +1,7 @@
 import { atom } from "recoil"
-import { Userdata } from "../Interfaces"
+import { LocalizedUserData } from "../interfaces/atom/LocalizedUserData"
 
-export const UserdataAtom = atom<Userdata>({
+export const UserdataAtom = atom<LocalizedUserData>({
   key: "Userdata",
   default: {
     uid: "",

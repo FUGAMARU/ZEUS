@@ -13,10 +13,10 @@ import { Teacher } from "./interfaces/firestore/Teacher"
 import { Location } from "./interfaces/firestore/Location"
 import { Class } from "./interfaces/firestore/Class"
 import { User } from "./interfaces/firestore/User"
-import { RegisterUserDataInput } from "./interfaces/RegisterUserDataInput"
+import { RegisterUserDataInput } from "./interfaces/form/RegisterUserDataInput"
 
 // Class
-import { RegisterUser } from "./interfaces/RegisterUser"
+import { RegisterUser } from "./classes/RegisterUser"
 
 let app
 if (getApps().length < 1) {

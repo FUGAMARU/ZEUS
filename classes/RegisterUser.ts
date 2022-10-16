@@ -1,4 +1,4 @@
-import { User } from "./firestore/User"
+import { User } from "../interfaces/firestore/User"
 import { DocumentReference } from "firebase/firestore"
 
 export class RegisterUser implements User {
