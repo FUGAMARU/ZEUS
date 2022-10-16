@@ -207,36 +207,11 @@ const Register: NextPage = () => {
                 <Input ref={secondName} textAlign="center" variant="flushed" w="6rem" focusBorderColor="#10c9c3" placeholder="姓"></Input>
                 <Input ref={firstName} textAlign="center" variant="flushed" w="6rem" focusBorderColor="#10c9c3" placeholder="名"></Input>
               </Flex>
-              <Text className="kr" textAlign="center" fontSize="0.9rem" mt={3}>アカウントタイプ</Text>
-              <Center>
-                <RadioGroup onChange={setAccountType} value={accountType}>
-                  <Stack direction="row">
-                    <Radio value="student" colorScheme="cyan"><Text className="kr">学生</Text></Radio>
-                    <Radio value="teacher" colorScheme="cyan"><Text className="kr">教師</Text></Radio>
-                  </Stack>
-                </RadioGroup>
-              </Center>
-              <Text className="kr" textAlign="center" fontSize="0.9rem" mt={3}>キャンパス</Text>
-              <Center>
-                <RadioGroup onChange={setCampus} value={campus}>
-                  <Stack direction="row">
-                    <Radio value="K" colorScheme="cyan"><Text className="kr">蒲田</Text></Radio>
-                    <Radio value="G" colorScheme="cyan"><Text className="kr">八王子</Text></Radio>
-                    <Radio value="H" colorScheme="cyan"><Text className="kr">北海道</Text></Radio>
-                  </Stack>
-                </RadioGroup>
-              </Center>
               <Select placeholder="- 所属学科・学年・クラスを選択 -" mt={3} size="sm" onChange={(e) => setSelectedClass(e.target.value)}>
-                <option value="C2-35-1">情報処理科2年1組</option>
-                <option value="C2-35-2">情報処理科2年2組</option>
-                <option value="C2-35-3">情報処理科2年3組</option>
-                <option value="C2-35-4">情報処理科2年4組</option>
-                <option value="C2-36-1">情報処理科1年1組</option>
-                <option value="C2-36-2">情報処理科1年2組</option>
-                <option value="C2-36-3">情報処理科1年3組</option>
-                <option value="C2-36-4">情報処理科1年4組</option>
-                <option value="C2-36-5">情報処理科1年5組</option>
+                <option value="C2-35-4">情報処理科 2年4組</option>
+                <option value="PN-25-1">ネットワークセキュリティ科 2年1組</option>
               </Select>
+              <Text className="kr" mt={2} textAlign="center" fontSize="0.7rem" >※当サービスは八王子校のITカレッジのみ対応しています</Text>
               <Flex onClick={dataValidation} justifyContent="space-around" my={7} h="2.5rem" transition="0.2s all ease-out" _hover={{ bg: "#ffffff", boxShadow: "5px 5px 11px #dedede, -5px -5px 11px #ffffff" }} alignItems="center" px={5} py={3} borderRadius={25} cursor="pointer">
                 {showSpinner ? <Image src="/spinner.svg" height={20} width={20}></Image> : <Text className="ksb" color="#10c9c3">登録する</Text>}
               </Flex>
